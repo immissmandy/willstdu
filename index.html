@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Willst du mit mir gehen? 💕</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Quicksand:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 25%, #f48fb1 50%, #ce93d8 75%, #e1bee7 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 12s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating hearts background */
+        .bg-hearts {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-heart {
+            position: absolute;
+            font-size: 1.2rem;
+            opacity: 0.15;
+            animation: floatUp linear infinite;
+            color: #e91e63;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) rotate(0deg) scale(1);
+                opacity: 0;
+            }
+            10% { opacity: 0.15; }
+            90% { opacity: 0.15; }
+            100% {
+                transform: translateY(-10vh) rotate(360deg) scale(0.5);
+                opacity: 0;
+            }
+        }
+
+        /* Mandy + Lilith particles */
+        .name-particle {
+            position: fixed;
+            font-family: 'Dancing Script', cursive;
+            font-size: 0.75rem;
+            color: rgba(183, 28, 94, 0.35);
+            pointer-events: none;
+            z-index: 1;
+            white-space: nowrap;
+            animation: nameFloat linear infinite;
+            text-shadow: 0 0 4px rgba(233, 30, 99, 0.2);
+        }
+
+        @keyframes nameFloat {
+            0% {
+                transform: translate(0, 0) rotate(-5deg);
+                opacity: 0;
+            }
+            15% { opacity: 0.4; }
+            85% { opacity: 0.4; }
+            100% {
+                transform: translate(var(--dx), var(--dy)) rotate(5deg);
+                opacity: 0;
+            }
+        }
+
+        /* Main container */
+        .main-container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+        }
+
+        /* Glowing card */
+        .card {
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 2rem;
+            padding: 3rem 2.5rem;
+            box-shadow:
+                0 8px 32px rgba(233, 30, 99, 0.15),
+                0 0 60px rgba(233, 30, 99, 0.08),
+                inset 0 0 30px rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            position: relative;
+            overflow: visible;
+        }
+
+        .card::before {
+            content: '💕';
+            position: absolute;
+            top: -1.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.5rem;
+            animation: heartPulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heartPulse {
+            0%, 100% { transform: translateX(-50%) scale(1); }
+            50% { transform: translateX(-50%) scale(1.2); }
+        }
+
+        /* Main question text */
+        .question-text {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #ad1457;
+            margin: 1.5rem 0 2.5rem;
+            line-height: 1.4;
+            animation: textAppear 1.5s ease-out forwards;
+            text-shadow: 0 2px 8px rgba(173, 20, 87, 0.15);
+        }
+
+        .question-text .char {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(20px) scale(0.8);
+            animation: charReveal 0.5s ease forwards;
+        }
+
+        @keyframes charReveal {
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes textAppear {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Buttons container */
+        .buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.85rem 2.2rem;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.3), transparent);
+            border-radius: inherit;
+        }
+
+        .btn-ja {
+            background: linear-gradient(135deg, #e91e63, #c2185b);
+            color: white;
+            box-shadow: 0 4px 20px rgba(233, 30, 99, 0.4);
+        }
+
+        .btn-ja:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 30px rgba(233, 30, 99, 0.6);
+        }
+
+        .btn-nein {
+            background: linear-gradient(135deg, #78909c, #546e7a);
+            color: white;
+            box-shadow: 0 4px 15px rgba(84, 110, 122, 0.3);
+            z-index: 20;
+        }
+
+        .btn-nein:hover {
+            box-shadow: 0 6px 25px rgba(84, 110, 122, 0.5);
+        }
+
+        .btn-vielleicht {
+            background: linear-gradient(135deg, #ab47bc, #7b1fa2);
+            color: white;
+            box-shadow: 0 4px 20px rgba(171, 71, 188, 0.4);
+        }
+
+        .btn-vielleicht:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 30px rgba(171, 71, 188, 0.6);
+        }
+
+        /* Nein button escaping */
+        .btn-nein.escaping {
+            position: fixed;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            touch-action: none;
+        }
+
+        .btn-nein.tired {
+            transition: all 0.8s ease;
+            animation: neinWobble 0.5s ease-in-out infinite;
+        }
+
+        @keyframes neinWobble {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-3deg); }
+            75% { transform: rotate(3deg); }
+        }
+
+        /* Hearts explosion overlay */
+        .celebration-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            pointer-events: none;
+            display: none;
+        }
+
+        .celebration-overlay.active {
+            display: block;
+        }
+
+        .love-text {
+            position: fixed;
+            font-family: 'Dancing Script', cursive;
+            font-weight: 700;
+            color: #e91e63;
+            pointer-events: none;
+            z-index: 101;
+            animation: loveTextPop 2.5s ease-out forwards;
+            text-shadow: 0 2px 10px rgba(233, 30, 99, 0.3);
+        }
+
+        @keyframes loveTextPop {
+            0% {
+                opacity: 0;
+                transform: scale(0) rotate(-10deg);
+            }
+            20% {
+                opacity: 1;
+                transform: scale(1.2) rotate(5deg);
+            }
+            80% { opacity: 1; }
+            100% {
+                opacity: 0;
+                transform: scale(0.8) translateY(-30px);
+            }
+        }
+
+        .celebration-heart {
+            position: fixed;
+            pointer-events: none;
+            z-index: 100;
+            animation: celebHeart 3s ease-out forwards;
+        }
+
+        @keyframes celebHeart {
+            0% {
+                opacity: 1;
+                transform: scale(0) rotate(0deg);
+            }
+            20% {
+                opacity: 1;
+                transform: scale(1) rotate(20deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-200px) scale(0.5) rotate(360deg);
+            }
+        }
+
+        /* Crying overlay */
+        .crying-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            pointer-events: none;
+            display: none;
+        }
+
+        .crying-overlay.active {
+            display: block;
+            pointer-events: all;
+        }
+
+        .crying-emoji {
+            position: fixed;
+            font-size: 2.5rem;
+            pointer-events: none;
+            animation: cryFall 3s ease-in forwards;
+        }
+
+        @keyframes cryFall {
+            0% {
+                opacity: 1;
+                transform: translateY(-50px) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(110vh) rotate(720deg);
+            }
+        }
+
+        .crying-message {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            color: #546e7a;
+            text-align: center;
+            animation: sadAppear 1s ease-out;
+            z-index: 102;
+            background: rgba(255,255,255,0.9);
+            padding: 2rem 3rem;
+            border-radius: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .crying-message .retry-btn {
+            display: block;
+            margin: 1.5rem auto 0;
+            padding: 0.7rem 2rem;
+            background: linear-gradient(135deg, #e91e63, #c2185b);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            pointer-events: all;
+            transition: transform 0.3s;
+        }
+
+        .crying-message .retry-btn:hover {
+            transform: scale(1.1);
+        }
+
+        @keyframes sadAppear {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+        /* Vielleicht quiz modal */
+        .quiz-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 200;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .quiz-overlay.active {
+            display: flex;
+        }
+
+        .quiz-card {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(20px);
+            border-radius: 1.5rem;
+            padding: 2.5rem 2rem;
+            max-width: 520px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            animation: quizPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+
+        @keyframes quizPop {
+            from { opacity: 0; transform: scale(0.8) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .quiz-question {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #6a1b9a;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
+
+        .quiz-emoji {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .quiz-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .quiz-btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .quiz-btn-ja {
+            background: linear-gradient(135deg, #e91e63, #c2185b);
+            color: white;
+            box-shadow: 0 4px 15px rgba(233, 30, 99, 0.3);
+        }
+
+        .quiz-btn-ja:hover {
+            transform: scale(1.1);
+        }
+
+        .quiz-btn-nein {
+            background: linear-gradient(135deg, #78909c, #546e7a);
+            color: white;
+            box-shadow: 0 4px 10px rgba(84, 110, 122, 0.2);
+        }
+
+        .quiz-btn-nein:hover {
+            transform: scale(1.05);
+        }
+
+        /* Success screen */
+        .success-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 300;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 50%, #f48fb1 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        .success-screen.active {
+            display: flex;
+        }
+
+        .success-content {
+            text-align: center;
+            animation: successAppear 1s ease-out;
+            z-index: 301;
+        }
+
+        .success-content h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 3.5rem;
+            color: #c2185b;
+            margin-bottom: 1rem;
+            text-shadow: 0 3px 15px rgba(194, 24, 91, 0.2);
+        }
+
+        .success-content .big-heart {
+            font-size: 6rem;
+            display: block;
+            margin-bottom: 1rem;
+            animation: heartPulse 1s ease-in-out infinite;
+        }
+
+        .success-content p {
+            font-family: 'Quicksand', sans-serif;
+            font-size: 1.3rem;
+            color: #ad1457;
+            font-weight: 600;
+        }
+
+        @keyframes successAppear {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Results button */
+        .results-btn {
+            position: fixed;
+            bottom: 12px;
+            right: 14px;
+            z-index: 400;
+            background: transparent;
+            border: none;
+            color: rgba(173, 20, 87, 0.18);
+            font-size: 0.7rem;
+            font-family: 'Quicksand', sans-serif;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            transition: color 0.3s;
+            letter-spacing: 0.3px;
+        }
+        .results-btn:hover {
+            color: rgba(173, 20, 87, 0.45);
+        }
+
+        /* Results modal */
+        .results-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 500;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .results-overlay.active {
+            display: flex;
+        }
+        .results-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 1.2rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        .results-card h2 {
+            font-family: 'Dancing Script', cursive;
+            color: #ad1457;
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        .results-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            background: none;
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.2s;
+        }
+        .results-close:hover { color: #333; }
+        .results-list {
+            list-style: none;
+            padding: 0;
+        }
+        .results-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+            font-family: 'Quicksand', sans-serif;
+            font-size: 0.85rem;
+            color: #555;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .results-list li:last-child { border-bottom: none; }
+        .result-icon {
+            flex-shrink: 0;
+            width: 1.5rem;
+            text-align: center;
+        }
+        .result-time {
+            color: #aaa;
+            font-size: 0.75rem;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        .result-action {
+            font-weight: 600;
+            color: #333;
+        }
+        .results-empty {
+            text-align: center;
+            color: #aaa;
+            font-family: 'Quicksand', sans-serif;
+            padding: 2rem 0;
+        }
+        .results-clear {
+            display: block;
+            margin: 1rem auto 0;
+            padding: 0.4rem 1.2rem;
+            background: #eee;
+            border: none;
+            border-radius: 20px;
+            font-family: 'Quicksand', sans-serif;
+            font-size: 0.8rem;
+            color: #777;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .results-clear:hover { background: #ddd; }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .question-text { font-size: 1.8rem; }
+            .card { padding: 2rem 1.5rem; }
+            .btn { padding: 0.75rem 1.6rem; font-size: 1rem; }
+            .success-content h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating background hearts -->
+    <div class="bg-hearts" id="bgHearts"></div>
+
+    <!-- Name particles -->
+    <div id="nameParticles"></div>
+
+    <!-- Main content -->
+    <div class="main-container" id="mainContainer">
+        <div class="card">
+            <div class="question-text" id="questionText"></div>
+            <div class="buttons" id="mainButtons">
+                <button class="btn btn-ja" id="btnJa" onclick="handleJa()">Ja 💕</button>
+                <button class="btn btn-nein" id="btnNein">Nein 😅</button>
+                <button class="btn btn-vielleicht" id="btnVielleicht" onclick="handleVielleicht()">Vielleicht 🤔</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Celebration overlay (Ja) -->
+    <div class="celebration-overlay" id="celebrationOverlay"></div>
+
+    <!-- Crying overlay (Nein) -->
+    <div class="crying-overlay" id="cryingOverlay"></div>
+
+    <!-- Quiz overlay (Vielleicht) -->
+    <div class="quiz-overlay" id="quizOverlay">
+        <div class="quiz-card">
+            <span class="quiz-emoji" id="quizEmoji">🤔</span>
+            <div class="quiz-question" id="quizQuestion"></div>
+            <div class="quiz-buttons">
+                <button class="quiz-btn quiz-btn-ja" id="quizBtnJa">Ja</button>
+                <button class="quiz-btn quiz-btn-nein" id="quizBtnNein">Nein</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success screen -->
+    <div class="success-screen" id="successScreen">
+        <div class="success-content">
+            <span class="big-heart">💖</span>
+            <h1>Ich liebe dich, Lilith!</h1>
+            <p>Für immer und ewig 🥰</p>
+        </div>
+    </div>
+
+    <!-- Results button & modal -->
+    <button class="results-btn" onclick="showResults()">📋</button>
+    <div class="results-overlay" id="resultsOverlay">
+        <div class="results-card">
+            <button class="results-close" onclick="closeResults()">✕</button>
+            <h2>📊 Ergebnis-Log</h2>
+            <ul class="results-list" id="resultsList"></ul>
+            <button class="results-clear" onclick="clearResults()">Log löschen</button>
+        </div>
+    </div>
+
+    <script>
+        // ──────────────── Click Tracking ────────────────
+        // Optional: Set your webhook URL here to receive click data remotely
+        // e.g. a Google Apps Script, Discord webhook, or any POST endpoint
+        const TRACKING_WEBHOOK = ''; // Leave empty to only track locally
+
+        function trackEvent(action, extra = {}) {
+            const event = {
+                action,
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent,
+                ...extra
+            };
+
+            // Save to localStorage
+            try {
+                const log = JSON.parse(localStorage.getItem('willstdu_log') || '[]');
+                log.push(event);
+                localStorage.setItem('willstdu_log', JSON.stringify(log));
+            } catch (e) { /* storage full or blocked */ }
+
+            // Send to webhook if configured
+            if (TRACKING_WEBHOOK) {
+                try {
+                    navigator.sendBeacon(TRACKING_WEBHOOK, JSON.stringify(event));
+                } catch (e) { /* silently fail */ }
+            }
+        }
+
+        trackEvent('page_loaded');
+
+        // ──────────────── Results Modal ────────────────
+        const actionLabels = {
+            page_loaded: { icon: '🌐', label: 'Seite geöffnet' },
+            ja_clicked: { icon: '💕', label: 'JA geklickt!' },
+            nein_escaped: { icon: '🏃', label: 'Nein ist weggesprungen' },
+            nein_clicked: { icon: '😢', label: 'Nein erwischt' },
+            nein_retry: { icon: '🔄', label: 'Nochmal überlegen' },
+            vielleicht_clicked: { icon: '🤔', label: 'Vielleicht geklickt' },
+            quiz_ja: { icon: '✅', label: 'Quiz: Ja' },
+            quiz_nein: { icon: '❌', label: 'Quiz: Nein' }
+        };
+
+        function showResults() {
+            const overlay = document.getElementById('resultsOverlay');
+            const list = document.getElementById('resultsList');
+            overlay.classList.add('active');
+
+            let log = [];
+            try { log = JSON.parse(localStorage.getItem('willstdu_log') || '[]'); } catch(e) {}
+
+            if (log.length === 0) {
+                list.innerHTML = '<li class="results-empty">Noch keine Aktionen aufgezeichnet.</li>';
+                return;
+            }
+
+            list.innerHTML = log.map(entry => {
+                const info = actionLabels[entry.action] || { icon: '❓', label: entry.action };
+                const time = new Date(entry.timestamp);
+                const timeStr = time.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                let extra = '';
+                if (entry.escapeCount) extra = ` (#${entry.escapeCount})`;
+                if (entry.question) extra = ` — ${entry.question.substring(0, 40)}…`;
+                return `<li><span class="result-icon">${info.icon}</span><span class="result-action">${info.label}${extra}</span><span class="result-time">${timeStr}</span></li>`;
+            }).join('');
+        }
+
+        function closeResults() {
+            document.getElementById('resultsOverlay').classList.remove('active');
+        }
+
+        function clearResults() {
+            localStorage.removeItem('willstdu_log');
+            document.getElementById('resultsList').innerHTML = '<li class="results-empty">Log gelöscht.</li>';
+        }
+
+        // Close on backdrop click
+        document.getElementById('resultsOverlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeResults();
+        });
+
+        // ──────────────── Background Hearts ────────────────
+        const bgHearts = document.getElementById('bgHearts');
+        const heartSymbols = ['♥', '❤', '💕', '💗', '💖', '♡', '❣'];
+
+        function createBgHeart() {
+            const heart = document.createElement('span');
+            heart.className = 'bg-heart';
+            heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+            heart.style.left = Math.random() * 100 + '%';
+            heart.style.fontSize = (0.8 + Math.random() * 1.5) + 'rem';
+            heart.style.animationDuration = (8 + Math.random() * 12) + 's';
+            heart.style.animationDelay = Math.random() * 5 + 's';
+            bgHearts.appendChild(heart);
+            setTimeout(() => heart.remove(), 25000);
+        }
+
+        // Initial batch
+        for (let i = 0; i < 20; i++) {
+            setTimeout(createBgHeart, i * 300);
+        }
+        setInterval(createBgHeart, 1500);
+
+        // ──────────────── Name Particles ────────────────
+        const nameContainer = document.getElementById('nameParticles');
+        const nameTexts = ['Mandy + Lilith', 'M + L', '♥ M&L ♥', 'Mandy 💕 Lilith'];
+
+        function createNameParticle() {
+            const particle = document.createElement('span');
+            particle.className = 'name-particle';
+            particle.textContent = nameTexts[Math.floor(Math.random() * nameTexts.length)];
+
+            const startX = Math.random() * 100;
+            const startY = Math.random() * 100;
+            particle.style.left = startX + '%';
+            particle.style.top = startY + '%';
+            particle.style.fontSize = (0.65 + Math.random() * 0.5) + 'rem';
+
+            const dx = (Math.random() - 0.5) * 200;
+            const dy = (Math.random() - 0.5) * 200;
+            particle.style.setProperty('--dx', dx + 'px');
+            particle.style.setProperty('--dy', dy + 'px');
+            particle.style.animationDuration = (10 + Math.random() * 15) + 's';
+
+            nameContainer.appendChild(particle);
+            setTimeout(() => particle.remove(), 28000);
+        }
+
+        for (let i = 0; i < 15; i++) {
+            setTimeout(createNameParticle, i * 500);
+        }
+        setInterval(createNameParticle, 2000);
+
+        // ──────────────── Animated Question Text ────────────────
+        const questionText = document.getElementById('questionText');
+        const fullText = 'Lilith, willst du mit mir gehen? 💕';
+
+        function animateQuestion() {
+            questionText.innerHTML = '';
+            let delay = 0;
+            for (let i = 0; i < fullText.length; i++) {
+                const span = document.createElement('span');
+                span.className = 'char';
+                span.textContent = fullText[i] === ' ' ? '\u00A0' : fullText[i];
+                span.style.animationDelay = (delay) + 's';
+                questionText.appendChild(span);
+                delay += 0.05;
+            }
+        }
+        animateQuestion();
+
+        // ──────────────── Ja Button ────────────────
+        function handleJa() {
+            trackEvent('ja_clicked');
+            const overlay = document.getElementById('celebrationOverlay');
+            overlay.classList.add('active');
+
+            // Create celebration hearts
+            const heartEmojis = ['❤️', '💕', '💖', '💗', '💝', '💘', '🥰', '😍', '💞', '💓'];
+            for (let i = 0; i < 80; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('span');
+                    heart.className = 'celebration-heart';
+                    heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.top = Math.random() * 100 + 'vh';
+                    heart.style.fontSize = (1.5 + Math.random() * 3) + 'rem';
+                    heart.style.animationDelay = Math.random() * 0.5 + 's';
+                    overlay.appendChild(heart);
+                }, i * 50);
+            }
+
+            // Create "Ich liebe dich" texts
+            const loveMessages = ['Ich liebe dich!', '💕', 'Für immer!', '❤️', 'Du bist mein Alles!', 'Ich liebe dich so sehr!', '🥰'];
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const text = document.createElement('div');
+                    text.className = 'love-text';
+                    text.textContent = loveMessages[Math.floor(Math.random() * loveMessages.length)];
+                    text.style.left = (5 + Math.random() * 85) + 'vw';
+                    text.style.top = (5 + Math.random() * 85) + 'vh';
+                    text.style.fontSize = (1.2 + Math.random() * 2) + 'rem';
+                    text.style.transform = `rotate(${(Math.random() - 0.5) * 30}deg)`;
+                    overlay.appendChild(text);
+                }, i * 200);
+            }
+
+            // Show success screen after a moment
+            setTimeout(() => {
+                document.getElementById('successScreen').classList.add('active');
+                // Keep spawning hearts on success screen
+                setInterval(() => {
+                    const heart = document.createElement('span');
+                    heart.className = 'celebration-heart';
+                    heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+                    heart.style.left = Math.random() * 100 + 'vw';
+                    heart.style.top = Math.random() * 100 + 'vh';
+                    heart.style.fontSize = (1.5 + Math.random() * 2.5) + 'rem';
+                    heart.style.zIndex = '305';
+                    document.body.appendChild(heart);
+                    setTimeout(() => heart.remove(), 3000);
+                }, 300);
+            }, 3000);
+        }
+
+        // ──────────────── Nein Button (runs away) ────────────────
+        const btnNein = document.getElementById('btnNein');
+        let neinEscaping = false;
+        let neinClicks = 0;
+        let escapeCount = 0;
+        const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+
+        function moveNeinButton() {
+            escapeCount++;
+            trackEvent('nein_escaped', { escapeCount });
+
+            const btnWidth = btnNein.offsetWidth;
+            const btnHeight = btnNein.offsetHeight;
+            const padding = 20;
+            const maxX = window.innerWidth - btnWidth - padding;
+            const maxY = window.innerHeight - btnHeight - padding;
+
+            // After many escapes, reduce jump range so button becomes catchable
+            let rangeMultiplier = 1;
+            if (escapeCount > 12) {
+                rangeMultiplier = 0.4;
+                btnNein.classList.add('tired');
+            } else if (escapeCount > 8) {
+                rangeMultiplier = 0.6;
+            }
+
+            let newX, newY;
+            if (rangeMultiplier < 1) {
+                // Jump a shorter distance from current position
+                const currentLeft = parseFloat(btnNein.style.left) || maxX / 2;
+                const currentTop = parseFloat(btnNein.style.top) || maxY / 2;
+                const jumpRange = 150 * rangeMultiplier;
+                newX = currentLeft + (Math.random() - 0.5) * jumpRange * 2;
+                newY = currentTop + (Math.random() - 0.5) * jumpRange * 2;
+                // Clamp within viewport
+                newX = Math.max(padding, Math.min(maxX, newX));
+                newY = Math.max(padding, Math.min(maxY, newY));
+            } else {
+                newX = padding + Math.random() * maxX;
+                newY = padding + Math.random() * maxY;
+            }
+
+            btnNein.style.left = newX + 'px';
+            btnNein.style.top = newY + 'px';
+        }
+
+        function startEscaping() {
+            if (neinEscaping) return;
+            neinEscaping = true;
+            btnNein.classList.add('escaping');
+
+            const rect = btnNein.getBoundingClientRect();
+            btnNein.style.left = rect.left + 'px';
+            btnNein.style.top = rect.top + 'px';
+
+            moveNeinButton();
+        }
+
+        function handleNeinHover() {
+            if (neinEscaping) return;
+            neinClicks++;
+            if (neinClicks >= (isTouchDevice ? 1 : 3)) {
+                startEscaping();
+            }
+        }
+
+        // Desktop: mouse events
+        btnNein.addEventListener('mouseenter', () => {
+            if (neinEscaping) {
+                moveNeinButton();
+            }
+        });
+
+        btnNein.addEventListener('mouseover', () => {
+            handleNeinHover();
+            if (neinEscaping) {
+                moveNeinButton();
+            }
+        });
+
+        // Mobile: touch on the button itself jumps it away
+        btnNein.addEventListener('touchstart', (e) => {
+            if (!neinEscaping) {
+                handleNeinHover();
+                if (neinEscaping) {
+                    e.preventDefault();
+                }
+                return;
+            }
+            e.preventDefault();
+            moveNeinButton();
+        }, { passive: false });
+
+        // Mobile: track finger movement and escape if finger gets close
+        let lastTouchX = null;
+        let lastTouchY = null;
+
+        document.addEventListener('touchmove', (e) => {
+            if (!neinEscaping) return;
+            const touch = e.touches[0];
+            lastTouchX = touch.clientX;
+            lastTouchY = touch.clientY;
+
+            const rect = btnNein.getBoundingClientRect();
+            const btnCenterX = rect.left + rect.width / 2;
+            const btnCenterY = rect.top + rect.height / 2;
+            const dist = Math.hypot(touch.clientX - btnCenterX, touch.clientY - btnCenterY);
+
+            // Proximity threshold - escape when finger gets close
+            const threshold = escapeCount > 10 ? 40 : 80;
+            if (dist < threshold) {
+                moveNeinButton();
+            }
+        }, { passive: true });
+
+        // Also escape on touchend near button (tap near it)
+        document.addEventListener('touchend', (e) => {
+            if (!neinEscaping || !lastTouchX) return;
+            const rect = btnNein.getBoundingClientRect();
+            const btnCenterX = rect.left + rect.width / 2;
+            const btnCenterY = rect.top + rect.height / 2;
+            const dist = Math.hypot(lastTouchX - btnCenterX, lastTouchY - btnCenterY);
+
+            if (dist < 60 && dist > 5) {
+                moveNeinButton();
+            }
+        });
+
+        btnNein.addEventListener('click', () => {
+            if (!neinEscaping) {
+                handleNeinHover();
+                return;
+            }
+            trackEvent('nein_clicked');
+            showCryingOverlay();
+        });
+
+        function showCryingOverlay() {
+            const overlay = document.getElementById('cryingOverlay');
+            overlay.classList.add('active');
+            overlay.innerHTML = '';
+
+            // Raining crying emojis
+            const cryEmojis = ['😭', '😢', '💔', '🥺', '😿', '😞'];
+            for (let i = 0; i < 60; i++) {
+                setTimeout(() => {
+                    const emoji = document.createElement('span');
+                    emoji.className = 'crying-emoji';
+                    emoji.textContent = cryEmojis[Math.floor(Math.random() * cryEmojis.length)];
+                    emoji.style.left = Math.random() * 100 + 'vw';
+                    emoji.style.top = -50 + 'px';
+                    emoji.style.fontSize = (1.5 + Math.random() * 2.5) + 'rem';
+                    emoji.style.animationDelay = Math.random() * 0.5 + 's';
+                    overlay.appendChild(emoji);
+                }, i * 100);
+            }
+
+            // Show sad message
+            setTimeout(() => {
+                const msg = document.createElement('div');
+                msg.className = 'crying-message';
+                msg.innerHTML = `
+                    😢 Oh nein... 😢<br>
+                    <span style="font-size: 1.3rem; color: #78909c;">Bist du dir sicher?</span>
+                    <button class="retry-btn" onclick="resetFromCrying()">Nochmal überlegen 💕</button>
+                `;
+                overlay.appendChild(msg);
+            }, 1000);
+        }
+
+        function resetFromCrying() {
+            const overlay = document.getElementById('cryingOverlay');
+            overlay.classList.remove('active');
+            overlay.innerHTML = '';
+            neinEscaping = false;
+            neinClicks = 0;
+            escapeCount = 0;
+            btnNein.classList.remove('escaping', 'tired');
+            btnNein.style.left = '';
+            btnNein.style.top = '';
+            btnNein.style.position = '';
+            trackEvent('nein_retry');
+        }
+
+        // ──────────────── Vielleicht (Quiz) ────────────────
+        const quizQuestions = [
+            {
+                emoji: '🍳',
+                question: 'Wenn Mandy dir jeden Morgen Frühstück ans Bett bringt... dann klickst du doch auf Ja, oder?',
+                jaText: 'Na klar! 🥰',
+                neinText: 'Ich koche selbst 😤'
+            },
+            {
+                emoji: '🎬',
+                question: 'Wenn Mandy immer den Film aussuchen lässt, den DU willst... dann ist das doch ein Ja wert?',
+                jaText: 'Definitiv! 🍿',
+                neinText: 'Hmm nee 🤨'
+            },
+            {
+                emoji: '🧸',
+                question: 'Wenn Mandy dir unendlich viele Kuscheltiere kauft... ist das nicht ein Ja?',
+                jaText: 'JAAA! 🧸💕',
+                neinText: 'Ich hab genug 😅'
+            },
+            {
+                emoji: '🍫',
+                question: 'Wenn Mandy IMMER die letzte Schokolade für dich aufhebt... dann sagst du doch Ja?',
+                jaText: 'Schokolade = Ja! 🍫',
+                neinText: 'Nö 🙄'
+            },
+            {
+                emoji: '🎵',
+                question: 'Wenn Mandy dir jeden Tag ein Liebeslied singt (auch wenn sie nicht singen kann)... Ja?',
+                jaText: 'Wie süüüß! 😍',
+                neinText: 'Ohren tun weh 🙉'
+            },
+            {
+                emoji: '🌙',
+                question: 'Wenn Mandy dir jeden Abend eine Gute-Nacht-Nachricht schickt mit 100 Herz-Emojis... Ja oder Ja?',
+                jaText: 'JA! 💕💕💕',
+                neinText: '...nur 50 reichen 😏'
+            },
+            {
+                emoji: '☕',
+                question: 'Stell dir vor: Mandy bringt dir immer Kaffee genau so wie du ihn magst. Das ist doch Ja-würdig!',
+                jaText: 'Absolut! ☕💕',
+                neinText: 'Ich trink Tee 🍵'
+            },
+            {
+                emoji: '🐾',
+                question: 'Wenn Mandy mit dir zusammen jeden Hund auf der Straße streichelt... MUSS das ein Ja sein!',
+                jaText: 'HUNDEEEE! JA! 🐕',
+                neinText: 'Katzen > Hunde 🐱'
+            },
+            {
+                emoji: '🎮',
+                question: 'Wenn Mandy dich IMMER gewinnen lässt (naja, meistens)... dann klick Ja!',
+                jaText: 'Deal! 🏆',
+                neinText: 'Ich gewinne eh 😎'
+            },
+            {
+                emoji: '🌺',
+                question: 'Letzte Chance! Mandy verspricht dir unendlich viel Liebe, Kuscheleinheiten und Snacks. Ja. Oder. Ja?',
+                jaText: 'JA JA JA! 💕',
+                neinText: 'Mehr Snacks bitte 🍕'
+            }
+        ];
+
+        let currentQuizIndex = 0;
+        let shuffledQuiz = [];
+
+        function shuffleArray(arr) {
+            const shuffled = [...arr];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        function handleVielleicht() {
+            trackEvent('vielleicht_clicked');
+            shuffledQuiz = shuffleArray(quizQuestions);
+            currentQuizIndex = 0;
+            showQuizQuestion();
+        }
+
+        function showQuizQuestion() {
+            const overlay = document.getElementById('quizOverlay');
+            overlay.classList.add('active');
+
+            const q = shuffledQuiz[currentQuizIndex];
+            document.getElementById('quizEmoji').textContent = q.emoji;
+            document.getElementById('quizQuestion').textContent = q.question;
+
+            const btnJa = document.getElementById('quizBtnJa');
+            const btnNein = document.getElementById('quizBtnNein');
+            btnJa.textContent = q.jaText;
+            btnNein.textContent = q.neinText;
+
+            btnJa.onclick = () => {
+                trackEvent('quiz_ja', { question: q.question });
+                overlay.classList.remove('active');
+                // Clicking Ja goes back to main question
+                animateQuestion();
+            };
+
+            btnNein.onclick = () => {
+                trackEvent('quiz_nein', { question: q.question });
+                currentQuizIndex++;
+                if (currentQuizIndex >= shuffledQuiz.length) {
+                    // Ran out of questions, loop back
+                    currentQuizIndex = 0;
+                    shuffledQuiz = shuffleArray(quizQuestions);
+                }
+                // Animate card transition
+                const card = document.querySelector('.quiz-card');
+                card.style.animation = 'none';
+                card.offsetHeight; // trigger reflow
+                card.style.animation = 'quizPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                showQuizQuestion();
+            };
+        }
+    </script>
+</body>
+</html>
