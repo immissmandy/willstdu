@@ -3,381 +3,1901 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Skyrim: Liliths Bestimmung</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <title>⚔️ Die Quest der Liebe</title>
     <style>
-        :root {
-            --skyrim-gold: #c4b67a;
-            --skyrim-silver: #e0e0e0;
-            --skyrim-bg: rgba(12, 12, 15, 0.95);
-            --emerald: #2ecc71;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;600;700;900&family=Cinzel+Decorative:wght@400;700;900&family=IM+Fell+English+SC&display=swap');
 
-        * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            background: #050505;
-            color: white;
-            font-family: 'Cinzel', serif;
+            min-height: 100vh;
             overflow: hidden;
-            height: 100vh;
-        }
-
-        /* Hintergrund mit CSS-Nebelaffekt */
-        .world {
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(circle at center, #1a1a2e 0%, #050505 100%);
-            display: none;
-            z-index: -1;
-        }
-
-        .mist {
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            background: url('https://www.transparenttextures.com/patterns/asfalt-dark.png');
-            opacity: 0.2;
-            animation: moveMist 60s linear infinite;
-        }
-
-        @keyframes moveMist {
-            from { transform: translate(-25%, -25%) rotate(0deg); }
-            to { transform: translate(0%, 0%) rotate(5deg); }
-        }
-
-        /* Cinematic Intro */
-        #storyIntro {
-            position: fixed;
-            inset: 0;
-            background: black;
-            z-index: 2000;
+            font-family: 'MedievalSharp', cursive;
+            background: #0a0a12;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 40px;
-            text-align: center;
+            color: #e8dcc8;
         }
+
+        /* ─── Dark fantasy background ─── */
+        .bg-layer {
+            position: fixed; inset: 0; z-index: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(30,10,60,0.8) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 30%, rgba(60,20,40,0.6) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(10,30,60,0.7) 0%, transparent 60%),
+                linear-gradient(180deg, #0a0a12 0%, #1a1028 40%, #0d1520 100%);
+            animation: bgPulse 10s ease-in-out infinite alternate;
+        }
+        @keyframes bgPulse { 0% { opacity: 1; } 100% { opacity: 0.85; } }
+
+        .vignette {
+            position: fixed; inset: 0; z-index: 1;
+            background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
+            pointer-events: none;
+        }
+
+        /* ─── Magic particles ─── */
+        .particle-container { position: fixed; inset: 0; z-index: 2; pointer-events: none; overflow: hidden; }
+
+        .magic-particle {
+            position: absolute; border-radius: 50%; pointer-events: none;
+            animation: particleFloat linear infinite;
+        }
+        @keyframes particleFloat {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 1; transform: translateY(90vh) scale(1); }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) scale(0.3); opacity: 0; }
+        }
+
+        /* ─── Name runes ─── */
+        .rune-particle {
+            position: fixed; font-family: 'IM Fell English SC', serif; font-size: 0.65rem;
+            color: rgba(180,140,255,0.2); pointer-events: none; z-index: 2;
+            white-space: nowrap; animation: runeFloat linear infinite;
+            text-shadow: 0 0 6px rgba(140,100,255,0.3); letter-spacing: 2px;
+        }
+        @keyframes runeFloat {
+            0% { transform: translate(0,0) rotate(-3deg); opacity: 0; }
+            15% { opacity: 0.25; } 85% { opacity: 0.25; }
+            100% { transform: translate(var(--dx), var(--dy)) rotate(3deg); opacity: 0; }
+        }
+
+        /* ─── Quest notification (Skyrim-style) ─── */
+        .quest-notification {
+            position: fixed; top: -80px; left: 50%; transform: translateX(-50%);
+            z-index: 50; text-align: center; pointer-events: none;
+            transition: top 0.8s cubic-bezier(0.16,1,0.3,1);
+        }
+        .quest-notification.show { top: 40px; }
+        .quest-notification .quest-label {
+            font-family: 'Cinzel', serif; font-size: 0.7rem;
+            text-transform: uppercase; letter-spacing: 4px;
+            color: rgba(255,255,255,0.45); margin-bottom: 4px;
+        }
+        .quest-notification .quest-title {
+            font-family: 'Cinzel Decorative', cursive; font-size: 1.3rem;
+            color: #e8dcc8; text-shadow: 0 0 20px rgba(200,170,110,0.5);
+        }
+        .quest-notification .quest-line {
+            width: 200px; height: 1px; margin: 8px auto 0;
+            background: linear-gradient(90deg, transparent, rgba(200,170,110,0.4), transparent);
+        }
+
+        /* ─── Fade overlay ─── */
+        .fade-overlay {
+            position: fixed; inset: 0; background: #000; z-index: 40;
+            opacity: 0; pointer-events: none; transition: opacity 1s ease;
+        }
+        .fade-overlay.active { opacity: 1; }
+
+        /* ─── Intro screen ─── */
+        .intro-screen {
+            position: fixed; inset: 0; z-index: 30;
+            display: flex; justify-content: center; align-items: center; flex-direction: column;
+            cursor: pointer;
+        }
+        .intro-screen.hidden { display: none; }
 
         .intro-text {
-            font-size: 1.6rem;
-            line-height: 1.8;
-            color: var(--skyrim-silver);
-            max-width: 800px;
-            text-shadow: 0 0 15px rgba(255,255,255,0.5);
+            font-family: 'Cinzel', serif; font-size: 1.05rem; color: #c0b090;
+            text-align: center; max-width: 480px; line-height: 1.9;
+            opacity: 0; transform: translateY(15px); transition: all 1s ease;
+            padding: 0 2rem; white-space: pre-line;
+        }
+        .intro-text.visible { opacity: 1; transform: translateY(0); }
+
+        .intro-prompt {
+            font-family: 'Cinzel', serif; font-size: 0.75rem;
+            color: rgba(200,180,140,0.35); margin-top: 2rem;
+            opacity: 0; letter-spacing: 3px;
+            animation: promptBlink 2s ease-in-out infinite;
+        }
+        .intro-prompt.visible { opacity: 1; }
+        @keyframes promptBlink { 0%,100% { opacity: 0.25; } 50% { opacity: 0.6; } }
+
+        /* Typing cursor */
+        .typing-cursor {
+            display: inline-block; width: 2px; height: 1em;
+            background: #b48cff; margin-left: 2px;
+            animation: cursorBlink 0.8s step-end infinite;
+            vertical-align: text-bottom;
+        }
+        @keyframes cursorBlink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* ─── Main game area ─── */
+        .game-area {
+            position: relative; z-index: 10; width: 100%; max-width: 650px;
+            padding: 1rem; display: none;
+        }
+        .game-area.active { display: block; }
+
+        /* ─── Mage ─── */
+        .mage-scene { text-align: center; margin-bottom: 0.8rem; }
+        .mage-sprite {
+            font-size: 4.5rem; display: block;
+            animation: mageIdle 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(140,100,255,0.4));
+            margin-bottom: 0.3rem;
+        }
+        @keyframes mageIdle { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+        .mage-name {
+            font-family: 'Cinzel', serif; font-size: 0.8rem; color: #b48cff;
+            letter-spacing: 3px; text-transform: uppercase;
+            text-shadow: 0 0 10px rgba(140,100,255,0.3);
         }
 
-        /* Selbstgezeichneter Kompass (SVG) */
-        .compass-ui {
-            position: fixed;
-            top: 10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 400px;
-            display: none;
-            z-index: 100;
+        /* ─── Dialog box ─── */
+        .dialog-box {
+            background: linear-gradient(180deg, rgba(20,15,30,0.95), rgba(15,12,25,0.98));
+            border: 2px solid rgba(180,140,255,0.2); border-radius: 4px;
+            padding: 1.4rem 1.8rem; position: relative;
+            box-shadow: 0 0 30px rgba(140,100,255,0.08),
+                inset 0 1px 0 rgba(180,140,255,0.1),
+                inset 0 -1px 0 rgba(0,0,0,0.3);
         }
-
-        /* Quest Items (SVG Smaragde) */
-        .quest-item {
-            position: absolute;
-            width: 70px;
-            height: 70px;
-            cursor: pointer;
-            z-index: 10;
-            display: none;
-            filter: drop-shadow(0 0 15px var(--emerald));
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-20px) rotate(10deg); }
-        }
-
-        /* UI Benachrichtigung */
-        .notif {
-            position: fixed;
-            top: 20%;
-            width: 100%;
-            text-align: center;
-            opacity: 0;
+        .dialog-box::before {
+            content: ''; position: absolute; inset: 3px;
+            border: 1px solid rgba(180,140,255,0.07); border-radius: 2px;
             pointer-events: none;
-            z-index: 500;
+        }
+        .corner { position: absolute; width: 12px; height: 12px; border-color: rgba(200,170,110,0.5); border-style: solid; }
+        .corner-tl { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+        .corner-tr { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+        .corner-bl { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
+        .corner-br { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+        .dialog-text {
+            font-family: 'MedievalSharp', cursive; font-size: 1.1rem;
+            color: #e8dcc8; line-height: 1.7; text-align: center; min-height: 2.5em;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+        .dialog-text .hl {
+            color: #f0c060; text-shadow: 0 0 8px rgba(240,192,96,0.3);
         }
 
-        .notif.active { animation: questIn 4s forwards; }
+        /* ─── Choice buttons ─── */
+        .choices {
+            margin-top: 1.2rem; display: flex; flex-direction: column; gap: 0.45rem;
+            opacity: 0; transform: translateY(10px); transition: all 0.5s ease;
+        }
+        .choices.visible { opacity: 1; transform: translateY(0); }
 
-        @keyframes questIn {
-            0% { opacity: 0; transform: translateY(30px) scale(0.9); }
-            15% { opacity: 1; transform: translateY(0) scale(1); }
-            85% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-30px) scale(1.1); }
+        .choice-btn {
+            display: flex; align-items: center; gap: 0.7rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(180,140,255,0.12); border-radius: 3px;
+            padding: 0.7rem 1.1rem; cursor: pointer;
+            transition: all 0.25s ease;
+            font-family: 'MedievalSharp', cursive; font-size: 0.95rem;
+            color: #c0b090; text-align: left; position: relative; overflow: hidden;
+        }
+        .choice-btn::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 0;
+            background: linear-gradient(90deg, rgba(180,140,255,0.1), transparent);
+            transition: width 0.3s ease;
+        }
+        .choice-btn:hover {
+            border-color: rgba(200,170,110,0.4); color: #f0c060;
+            background: rgba(200,170,110,0.06);
+            text-shadow: 0 0 8px rgba(240,192,96,0.2);
+        }
+        .choice-btn:hover::before { width: 100%; }
+
+        .choice-num {
+            font-family: 'Cinzel', serif; font-size: 0.7rem;
+            color: rgba(180,140,255,0.5); min-width: 18px; flex-shrink: 0;
+        }
+        .choice-btn:hover .choice-num { color: #f0c060; }
+
+        /* Nein button escaping */
+        .choice-nein.escaping {
+            position: fixed; transition: all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
+            max-width: 280px; touch-action: none; z-index: 20;
+        }
+        .choice-nein.tired {
+            transition: all 0.8s ease;
+            animation: neinWobble 0.5s ease-in-out infinite;
+        }
+        @keyframes neinWobble { 0%,100% { transform: rotate(0deg); } 25% { transform: rotate(-2deg); } 75% { transform: rotate(2deg); } }
+
+        /* ─── Celebration ─── */
+        .celebration-overlay { position: fixed; inset: 0; z-index: 100; pointer-events: none; display: none; }
+        .celebration-overlay.active { display: block; }
+
+        .love-text-rpg {
+            position: fixed; font-family: 'Cinzel Decorative', cursive; font-weight: 700;
+            color: #f0c060; pointer-events: none; z-index: 101;
+            animation: loveTextPop 2.5s ease-out forwards;
+            text-shadow: 0 0 15px rgba(240,192,96,0.5);
+        }
+        @keyframes loveTextPop {
+            0% { opacity: 0; transform: scale(0) rotate(-10deg); }
+            20% { opacity: 1; transform: scale(1.2) rotate(5deg); }
+            80% { opacity: 1; }
+            100% { opacity: 0; transform: scale(0.8) translateY(-30px); }
         }
 
-        /* Dialog Box */
-        #dialogBox {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            height: 300px;
-            background: var(--skyrim-bg);
-            border-top: 2px solid var(--skyrim-gold);
-            padding: 40px 12%;
-            display: none;
-            z-index: 1000;
-            box-shadow: 0 -20px 50px rgba(0,0,0,0.8);
+        .celebration-heart {
+            position: fixed; pointer-events: none; z-index: 100;
+            animation: celebHeart 3s ease-out forwards;
+        }
+        @keyframes celebHeart {
+            0% { opacity: 1; transform: scale(0) rotate(0deg); }
+            20% { opacity: 1; transform: scale(1) rotate(20deg); }
+            100% { opacity: 0; transform: translateY(-200px) scale(0.5) rotate(360deg); }
         }
 
-        /* Magierin (SVG Avatar) */
-        #mageContainer {
-            position: fixed;
-            bottom: 200px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 300px;
-            height: 500px;
-            display: none;
-            z-index: 500;
-            filter: drop-shadow(0 0 30px #8a2be2);
+        /* ─── Success screen ─── */
+        .success-screen {
+            position: fixed; inset: 0; z-index: 300; display: none;
+            justify-content: center; align-items: center;
+            background: radial-gradient(ellipse at center, #1a1028 0%, #0a0a12 100%);
+        }
+        .success-screen.active { display: flex; }
+        .success-content { text-align: center; animation: successAppear 1s ease-out; z-index: 301; }
+        .success-content .big-icon {
+            font-size: 4.5rem; display: block; margin-bottom: 1rem;
+            animation: mageIdle 2s ease-in-out infinite;
+        }
+        .success-content h1 {
+            font-family: 'Cinzel Decorative', cursive; font-size: 2.2rem;
+            color: #f0c060; margin-bottom: 0.6rem;
+            text-shadow: 0 0 30px rgba(240,192,96,0.4);
+        }
+        .success-content p { font-family: 'MedievalSharp', cursive; font-size: 1.2rem; color: #b48cff; }
+        .success-content .quest-complete {
+            font-family: 'Cinzel', serif; font-size: 0.75rem;
+            text-transform: uppercase; letter-spacing: 4px;
+            color: rgba(255,255,255,0.35); margin-top: 1.5rem;
+        }
+        @keyframes successAppear { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+
+        /* ─── Crying overlay ─── */
+        .crying-overlay { position: fixed; inset: 0; z-index: 100; pointer-events: none; display: none; }
+        .crying-overlay.active { display: block; pointer-events: all; }
+        .crying-emoji { position: fixed; pointer-events: none; animation: cryFall 3s ease-in forwards; }
+        @keyframes cryFall {
+            0% { opacity: 1; transform: translateY(-50px) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(110vh) rotate(720deg); }
+        }
+        .crying-message {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+            text-align: center; animation: sadAppear 1s ease-out; z-index: 102;
+            background: rgba(15,12,25,0.95); border: 2px solid rgba(180,140,255,0.2);
+            padding: 2rem 2.5rem; border-radius: 4px;
+        }
+        .crying-message h3 { font-family: 'Cinzel Decorative', cursive; color: #8a8a9a; font-size: 1.4rem; margin-bottom: 0.5rem; }
+        .crying-message p { font-family: 'MedievalSharp', cursive; color: #8a8a9a; font-size: 1rem; margin-bottom: 1rem; }
+        .retry-btn {
+            display: inline-block; padding: 0.6rem 1.6rem;
+            background: linear-gradient(135deg, rgba(180,140,255,0.2), rgba(140,100,255,0.1));
+            border: 1px solid rgba(180,140,255,0.3); color: #b48cff;
+            font-family: 'MedievalSharp', cursive; font-size: 1rem;
+            cursor: pointer; border-radius: 3px; pointer-events: all; transition: all 0.3s;
+        }
+        .retry-btn:hover { background: rgba(180,140,255,0.15); border-color: rgba(200,170,110,0.5); color: #f0c060; }
+        @keyframes sadAppear {
+            from { opacity: 0; transform: translate(-50%,-50%) scale(0.5); }
+            to { opacity: 1; transform: translate(-50%,-50%) scale(1); }
         }
 
-        .speaker { color: var(--skyrim-gold); font-size: 1.3rem; margin-bottom: 10px; letter-spacing: 3px; }
-        .dialog-content { font-size: 1.5rem; color: #eee; text-shadow: 2px 2px 2px #000; min-height: 4.5em; }
+        /* ─── Quiz (Side Quest) ─── */
+        .quiz-overlay {
+            position: fixed; inset: 0; z-index: 200;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(6px);
+            display: none; justify-content: center; align-items: center;
+        }
+        .quiz-overlay.active { display: flex; }
+        .quiz-card {
+            background: linear-gradient(180deg, rgba(20,15,30,0.98), rgba(15,12,25,0.99));
+            border: 2px solid rgba(180,140,255,0.2); border-radius: 4px;
+            padding: 1.8rem 1.5rem; max-width: 500px; width: 90%;
+            text-align: center; box-shadow: 0 0 40px rgba(140,100,255,0.1);
+            animation: quizPop 0.4s cubic-bezier(0.175,0.885,0.32,1.275); position: relative;
+        }
+        @keyframes quizPop {
+            from { opacity: 0; transform: scale(0.8) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .quiz-npc { font-size: 2.5rem; margin-bottom: 0.5rem; display: block; }
+        .quiz-question {
+            font-family: 'MedievalSharp', cursive; font-size: 1.05rem;
+            color: #e8dcc8; margin-bottom: 1.3rem; line-height: 1.6;
+        }
+        .quiz-buttons { display: flex; gap: 0.7rem; justify-content: center; flex-wrap: wrap; }
+        .quiz-btn {
+            padding: 0.6rem 1.5rem; border: 1px solid rgba(180,140,255,0.2);
+            border-radius: 3px; font-family: 'MedievalSharp', cursive;
+            font-size: 0.9rem; cursor: pointer; transition: all 0.3s;
+        }
+        .quiz-btn-ja {
+            background: linear-gradient(135deg, rgba(240,192,96,0.15), rgba(200,170,110,0.08));
+            color: #f0c060; border-color: rgba(200,170,110,0.3);
+        }
+        .quiz-btn-ja:hover { background: rgba(240,192,96,0.2); transform: scale(1.05); }
+        .quiz-btn-nein { background: rgba(255,255,255,0.03); color: #8a8a9a; }
+        .quiz-btn-nein:hover { background: rgba(255,255,255,0.06); color: #c0b090; }
 
-        .btn {
-            background: none; border: none; color: #888; font-family: 'Cinzel', serif;
-            font-size: 1.1rem; cursor: pointer; display: block; margin-top: 15px; text-align: left;
-            transition: 0.3s; width: fit-content;
+        /* ─── Results ─── */
+        .results-btn {
+            position: fixed; bottom: 10px; right: 12px; z-index: 400;
+            background: transparent; border: none; color: rgba(180,140,255,0.15);
+            font-size: 0.65rem; font-family: 'Cinzel', serif;
+            cursor: pointer; padding: 4px 8px; transition: color 0.3s; letter-spacing: 1px;
         }
-        .btn:hover { color: #fff; padding-left: 20px; text-shadow: 0 0 10px var(--skyrim-gold); }
+        .results-btn:hover { color: rgba(180,140,255,0.4); }
 
-        #levelUp {
-            position: fixed; inset: 0; background: white; color: black;
-            display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 3000;
-            text-align: center;
+        .results-overlay {
+            position: fixed; inset: 0; z-index: 500;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center;
+        }
+        .results-overlay.active { display: flex; }
+        .results-card {
+            background: rgba(15,12,25,0.97); border: 2px solid rgba(180,140,255,0.2);
+            border-radius: 4px; padding: 1.5rem; max-width: 460px; width: 90%;
+            max-height: 80vh; overflow-y: auto; position: relative;
+        }
+        .results-card h2 {
+            font-family: 'Cinzel', serif; color: #f0c060; font-size: 1rem;
+            margin-bottom: 1rem; text-align: center; letter-spacing: 2px;
+        }
+        .results-close {
+            position: absolute; top: 10px; right: 14px; background: none;
+            border: none; font-size: 1.1rem; cursor: pointer;
+            color: rgba(255,255,255,0.3); transition: color 0.2s;
+        }
+        .results-close:hover { color: #f0c060; }
+        .results-list { list-style: none; padding: 0; }
+        .results-list li {
+            padding: 0.4rem 0; border-bottom: 1px solid rgba(180,140,255,0.06);
+            font-family: 'MedievalSharp', cursive; font-size: 0.8rem; color: #8a8a9a;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .results-list li:last-child { border-bottom: none; }
+        .result-icon { flex-shrink: 0; width: 1.3rem; text-align: center; }
+        .result-time { color: rgba(180,140,255,0.3); font-size: 0.65rem; margin-left: auto; flex-shrink: 0; }
+        .result-action { color: #c0b090; }
+        .results-empty { text-align: center; color: #555; padding: 1.5rem 0; }
+        .results-clear {
+            display: block; margin: 1rem auto 0; padding: 0.3rem 1rem;
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(180,140,255,0.15);
+            border-radius: 3px; font-family: 'MedievalSharp', cursive;
+            font-size: 0.7rem; color: #555; cursor: pointer; transition: all 0.2s;
+        }
+        .results-clear:hover { border-color: rgba(200,170,110,0.3); color: #aaa; }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 480px) {
+            .dialog-text { font-size: 0.95rem; }
+            .dialog-box { padding: 1.1rem 0.9rem; }
+            .choice-btn { font-size: 0.85rem; padding: 0.6rem 0.9rem; }
+            .success-content h1 { font-size: 1.7rem; }
+            .intro-text { font-size: 0.9rem; }
+            .mage-sprite { font-size: 3.5rem; }
+            .quest-notification .quest-title { font-size: 1.05rem; }
         }
 
-        .start-quest-btn {
-            margin-top: 30px; padding: 12px 35px; background: rgba(255,255,255,0.1);
-            border: 1px solid var(--skyrim-gold); color: var(--skyrim-gold);
-            font-family: 'Cinzel'; cursor: pointer; font-size: 1.2rem; transition: 0.3s;
+        /* ═══════ RPG HUD ═══════ */
+        .rpg-hud {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+            background: linear-gradient(180deg, rgba(10,8,18,0.95) 0%, rgba(10,8,18,0.8) 80%, transparent 100%);
+            padding: 8px 16px 14px; display: none;
+            border-bottom: 1px solid rgba(180,140,255,0.1);
+            font-family: 'Cinzel', serif;
         }
-        .start-quest-btn:hover { background: var(--skyrim-gold); color: black; }
+        .rpg-hud.active { display: block; }
+        .hud-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: center; }
+        .hud-group { display: flex; align-items: center; gap: 5px; }
+        .hud-level {
+            font-size: 0.85rem; color: #f0c060; font-weight: 700;
+            text-shadow: 0 0 10px rgba(240,192,96,0.4); min-width: 55px;
+        }
+        .hud-bar-wrap {
+            width: 90px; height: 8px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 2px;
+            overflow: hidden; position: relative;
+        }
+        .hud-bar {
+            height: 100%; border-radius: 1px; transition: width 0.5s ease; position: relative;
+        }
+        .hud-bar::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(255,255,255,0.2) 0%, transparent 60%);
+        }
+        .hud-bar.hp { background: linear-gradient(90deg, #ff3344, #ff6655); width: 100%; }
+        .hud-bar.mana { background: linear-gradient(90deg, #4466ff, #8899ff); width: 100%; }
+        .hud-bar.xp { background: linear-gradient(90deg, #f0c060, #ffdd88); width: 0%; }
+        .hud-icon { font-size: 0.7rem; }
+        .hud-gold { font-size: 0.7rem; color: #f0c060; }
+        .hud-gold-val { color: #f0c060; font-weight: 700; }
 
-        /* LOGBUCH CSS */
-        #logBtn {
-            position: fixed; bottom: 5px; right: 5px; opacity: 0.1; background: none; border: none;
-            color: white; font-size: 10px; cursor: pointer; z-index: 5000;
+        /* ═══════ Floating combat text ═══════ */
+        .float-text {
+            position: fixed; pointer-events: none; z-index: 150;
+            font-family: 'Cinzel', serif; font-weight: 700;
+            animation: floatUp 1.8s ease-out forwards;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
-        #logModal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 6000;
-            display: none; padding: 40px; overflow-y: auto; font-family: sans-serif;
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0) scale(0.5); }
+            20% { opacity: 1; transform: translateY(-10px) scale(1.2); }
+            40% { transform: translateY(-25px) scale(1); }
+            100% { opacity: 0; transform: translateY(-80px) scale(0.8); }
         }
-        .log-entry { border-bottom: 1px solid #333; padding: 10px; font-family: monospace; }
+        .float-text.xp { color: #f0c060; font-size: 1.1rem; }
+        .float-text.heal { color: #44ff66; font-size: 1rem; }
+        .float-text.damage { color: #ff4455; font-size: 1.2rem; }
+        .float-text.crit {
+            color: #ff00ff; font-size: 1.6rem;
+            animation: floatCrit 1.8s ease-out forwards;
+        }
+        @keyframes floatCrit {
+            0% { opacity: 1; transform: translateY(0) scale(0.3) rotate(-10deg); }
+            15% { opacity: 1; transform: translateY(-10px) scale(1.5) rotate(5deg); }
+            30% { transform: translateY(-20px) scale(1.1) rotate(-2deg); }
+            100% { opacity: 0; transform: translateY(-90px) scale(0.7) rotate(0deg); }
+        }
+        .float-text.gold { color: #f0c060; font-size: 0.9rem; }
+
+        /* ═══════ Level up overlay ═══════ */
+        .levelup-overlay {
+            position: fixed; inset: 0; z-index: 160;
+            background: rgba(240,192,96,0.05);
+            display: none; justify-content: center; align-items: center;
+            pointer-events: none;
+        }
+        .levelup-overlay.active { display: flex; }
+        .levelup-text {
+            font-family: 'Cinzel Decorative', cursive; font-size: 2.5rem;
+            color: #f0c060; text-shadow: 0 0 40px rgba(240,192,96,0.6), 0 0 80px rgba(240,192,96,0.3);
+            animation: levelUpPop 2.2s ease-out forwards;
+        }
+        @keyframes levelUpPop {
+            0% { opacity: 0; transform: scale(0) rotate(-15deg); }
+            20% { opacity: 1; transform: scale(1.3) rotate(3deg); }
+            40% { transform: scale(1) rotate(0deg); }
+            80% { opacity: 1; }
+            100% { opacity: 0; transform: scale(1.5) translateY(-30px); }
+        }
+        .levelup-sub {
+            font-family: 'Cinzel', serif; font-size: 0.8rem; color: rgba(240,192,96,0.7);
+            letter-spacing: 3px; text-transform: uppercase; margin-top: 8px;
+            animation: fadeInDelay 2.2s ease forwards;
+        }
+        @keyframes fadeInDelay { 0%,30% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+
+        /* ═══════ Achievement toast ═══════ */
+        .achievement-container {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            z-index: 170; display: flex; flex-direction: column-reverse; gap: 8px;
+            pointer-events: none;
+        }
+        .achievement-toast {
+            background: linear-gradient(135deg, rgba(20,15,30,0.95), rgba(30,20,50,0.95));
+            border: 1px solid rgba(240,192,96,0.4); border-radius: 4px;
+            padding: 10px 18px; display: flex; align-items: center; gap: 10px;
+            animation: achievePop 3.5s ease forwards;
+            box-shadow: 0 0 20px rgba(240,192,96,0.15); min-width: 250px;
+        }
+        @keyframes achievePop {
+            0% { opacity: 0; transform: translateY(30px) scale(0.8); }
+            10% { opacity: 1; transform: translateY(0) scale(1.05); }
+            15% { transform: scale(1); }
+            80% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-10px); }
+        }
+        .achieve-icon { font-size: 1.5rem; }
+        .achieve-info { display: flex; flex-direction: column; }
+        .achieve-label { font-family: 'Cinzel', serif; font-size: 0.55rem; color: rgba(240,192,96,0.7); letter-spacing: 2px; text-transform: uppercase; }
+        .achieve-name { font-family: 'MedievalSharp', cursive; font-size: 0.85rem; color: #f0c060; }
+
+        /* ═══════ Loot drop ═══════ */
+        .loot-popup {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            z-index: 155; background: linear-gradient(180deg, rgba(20,15,30,0.97), rgba(15,12,25,0.98));
+            border: 2px solid rgba(240,192,96,0.3); border-radius: 4px;
+            padding: 1.2rem 1.8rem; text-align: center;
+            animation: lootPop 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+            box-shadow: 0 0 40px rgba(240,192,96,0.1); pointer-events: none; display: none;
+        }
+        .loot-popup.active { display: block; }
+        @keyframes lootPop {
+            from { opacity: 0; transform: translate(-50%,-50%) scale(0.5); }
+            to { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+        }
+        .loot-title { font-family: 'Cinzel', serif; font-size: 0.6rem; color: rgba(240,192,96,0.6); text-transform: uppercase; letter-spacing: 3px; margin-bottom: 6px; }
+        .loot-item { font-size: 2rem; margin-bottom: 4px; display: block; }
+        .loot-name { font-family: 'MedievalSharp', cursive; font-size: 1rem; color: #f0c060; }
+        .loot-rarity { font-family: 'Cinzel', serif; font-size: 0.55rem; letter-spacing: 2px; margin-top: 4px; }
+        .loot-rarity.common { color: #8a8a9a; }
+        .loot-rarity.uncommon { color: #44cc44; }
+        .loot-rarity.rare { color: #4488ff; }
+        .loot-rarity.epic { color: #bb44ff; }
+        .loot-rarity.legendary { color: #ff8800; text-shadow: 0 0 10px rgba(255,136,0,0.4); }
+
+        /* ═══════ Battle transition ═══════ */
+        .battle-transition {
+            position: fixed; inset: 0; z-index: 195; pointer-events: none; display: none;
+        }
+        .battle-transition.active { display: block; }
+        .battle-flash {
+            position: absolute; inset: 0; background: white; opacity: 0;
+            animation: battleFlash 0.8s ease-out;
+        }
+        @keyframes battleFlash { 0% { opacity: 0; } 15% { opacity: 0.8; } 100% { opacity: 0; } }
+        .battle-lines {
+            position: absolute; inset: 0; overflow: hidden;
+        }
+        .battle-line {
+            position: absolute; height: 3px; background: rgba(255,255,255,0.6);
+            animation: slashLine 0.5s ease-out forwards;
+        }
+        @keyframes slashLine {
+            0% { width: 0; opacity: 1; }
+            50% { width: 120%; opacity: 0.8; }
+            100% { width: 120%; opacity: 0; }
+        }
+
+        /* ═══════ Screen shake ═══════ */
+        @keyframes screenShake {
+            0% { transform: translate(0,0); } 10% { transform: translate(-3px,2px); }
+            20% { transform: translate(3px,-2px); } 30% { transform: translate(-2px,3px); }
+            40% { transform: translate(2px,-1px); } 50% { transform: translate(-1px,2px); }
+            60% { transform: translate(1px,-1px); } 70% { transform: translate(-1px,1px); }
+            80% { transform: translate(1px,0); } 100% { transform: translate(0,0); }
+        }
+        .screen-shake { animation: screenShake 0.4s ease-out; }
+
+        /* ═══════ Boss HP bar ═══════ */
+        .boss-bar-wrap { margin-bottom: 0.6rem; display: none; }
+        .boss-bar-wrap.active { display: block; }
+        .boss-bar-label {
+            font-family: 'Cinzel', serif; font-size: 0.55rem; color: rgba(255,60,80,0.6);
+            text-transform: uppercase; letter-spacing: 2px; text-align: center; margin-bottom: 3px;
+        }
+        .boss-bar-name {
+            font-family: 'MedievalSharp', cursive; font-size: 0.75rem; color: #ff6655;
+            text-align: center; margin-bottom: 4px;
+            text-shadow: 0 0 8px rgba(255,60,60,0.3);
+        }
+        .boss-bar-outer {
+            width: 100%; height: 10px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,60,80,0.2); border-radius: 2px; overflow: hidden;
+        }
+        .boss-bar-inner {
+            height: 100%; background: linear-gradient(90deg, #ff2244, #ff6644);
+            width: 100%; transition: width 1s ease; border-radius: 1px; position: relative;
+        }
+        .boss-bar-inner::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(180deg, rgba(255,255,255,0.25) 0%, transparent 60%);
+        }
+
+        /* ═══════ Spell burst particles ═══════ */
+        .spell-burst {
+            position: fixed; pointer-events: none; z-index: 140; border-radius: 50%;
+            animation: spellBurst 0.8s ease-out forwards;
+        }
+        @keyframes spellBurst {
+            0% { opacity: 1; transform: scale(0); }
+            50% { opacity: 0.8; }
+            100% { opacity: 0; transform: scale(3); }
+        }
+
+        /* ═══════ Quest tracker ═══════ */
+        .quest-tracker {
+            position: fixed; top: 55px; right: 12px; z-index: 15;
+            font-family: 'Cinzel', serif; text-align: right; display: none;
+        }
+        .quest-tracker.active { display: block; }
+        .qt-header {
+            font-size: 0.5rem; color: rgba(200,180,140,0.35);
+            text-transform: uppercase; letter-spacing: 2px; margin-bottom: 4px;
+        }
+        .qt-item {
+            font-family: 'MedievalSharp', cursive; font-size: 0.65rem;
+            color: rgba(200,180,140,0.4); margin-bottom: 2px; transition: all 0.3s;
+        }
+        .qt-item.complete { text-decoration: line-through; color: rgba(100,180,100,0.4); }
+        .qt-item.current { color: #f0c060; text-shadow: 0 0 5px rgba(240,192,96,0.3); }
+        .qt-item::before { content: '◇ '; }
+        .qt-item.complete::before { content: '◆ '; }
+
+        /* ═══════ Inventory panel ═══════ */
+        .inventory-btn {
+            position: fixed; bottom: 10px; left: 12px; z-index: 400;
+            background: rgba(15,12,25,0.8); border: 1px solid rgba(180,140,255,0.15);
+            color: rgba(180,140,255,0.4); font-size: 0.95rem;
+            cursor: pointer; padding: 4px 10px; transition: all 0.3s;
+            border-radius: 3px; display: none;
+        }
+        .inventory-btn.active { display: block; }
+        .inventory-btn:hover { border-color: rgba(200,170,110,0.4); color: #f0c060; }
+        .inventory-overlay {
+            position: fixed; inset: 0; z-index: 500;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+            display: none; justify-content: center; align-items: center;
+        }
+        .inventory-overlay.active { display: flex; }
+        .inventory-card {
+            background: rgba(15,12,25,0.97); border: 2px solid rgba(180,140,255,0.2);
+            border-radius: 4px; padding: 1.5rem; max-width: 400px; width: 90%;
+            max-height: 70vh; overflow-y: auto; position: relative;
+        }
+        .inventory-card h2 {
+            font-family: 'Cinzel', serif; color: #f0c060; font-size: 1rem;
+            margin-bottom: 0.5rem; text-align: center; letter-spacing: 2px;
+        }
+        .inventory-close {
+            position: absolute; top: 10px; right: 14px; background: none;
+            border: none; font-size: 1.1rem; cursor: pointer;
+            color: rgba(255,255,255,0.3); transition: color 0.2s;
+        }
+        .inventory-close:hover { color: #f0c060; }
+        .inventory-stats {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 4px;
+            margin-bottom: 1rem; padding-bottom: 0.8rem;
+            border-bottom: 1px solid rgba(180,140,255,0.1);
+        }
+        .stat-item {
+            font-family: 'Cinzel', serif; font-size: 0.65rem; color: #8a8a9a;
+            display: flex; justify-content: space-between; padding: 2px 6px;
+        }
+        .stat-val { color: #b48cff; font-weight: 700; }
+        .inventory-items { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+        .inv-slot {
+            aspect-ratio: 1; background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(180,140,255,0.08); border-radius: 3px;
+            display: flex; justify-content: center; align-items: center;
+            font-size: 1.3rem; position: relative; cursor: default; transition: border-color 0.2s;
+        }
+        .inv-slot:hover { border-color: rgba(200,170,110,0.3); }
+        .inv-slot.empty { opacity: 0.3; }
+        .inv-slot .inv-tooltip {
+            display: none; position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%);
+            background: rgba(15,12,25,0.97); border: 1px solid rgba(180,140,255,0.3);
+            padding: 4px 8px; border-radius: 3px; white-space: nowrap; z-index: 10;
+            font-family: 'MedievalSharp', cursive; font-size: 0.65rem; color: #e8dcc8;
+        }
+        .inv-slot:hover .inv-tooltip { display: block; }
+
+        /* ═══════ Damage flash ═══════ */
+        .damage-flash {
+            position: fixed; inset: 0; z-index: 45; pointer-events: none;
+            background: rgba(255,0,0,0.15); opacity: 0; transition: opacity 0.1s ease;
+        }
+        .damage-flash.active { opacity: 1; }
+
+        /* ═══════ Mana cost indicator ═══════ */
+        .mana-cost {
+            font-family: 'Cinzel', serif; font-size: 0.55rem; color: #4488ff;
+            margin-left: auto; flex-shrink: 0; opacity: 0.6;
+        }
+
+        /* ═══════ Emoji Collector Mini-Quest ═══════ */
+        .collect-overlay {
+            position: fixed; inset: 0; z-index: 35;
+            display: none; cursor: default;
+        }
+        .collect-overlay.active { display: block; }
+        .collect-hud {
+            position: fixed; top: 50px; left: 50%; transform: translateX(-50%);
+            z-index: 36; text-align: center; pointer-events: none;
+        }
+        .collect-title {
+            font-family: 'Cinzel Decorative', cursive; font-size: 1.1rem;
+            color: #f0c060; text-shadow: 0 0 15px rgba(240,192,96,0.4);
+            margin-bottom: 6px;
+        }
+        .collect-counter {
+            font-family: 'Cinzel', serif; font-size: 0.75rem;
+            color: #b48cff; letter-spacing: 2px;
+        }
+        .collect-counter .cc-num { color: #f0c060; font-weight: 700; font-size: 0.9rem; }
+        .collect-progress-wrap {
+            width: 200px; height: 6px; background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(180,140,255,0.15); border-radius: 3px;
+            margin: 8px auto 0; overflow: hidden;
+        }
+        .collect-progress {
+            height: 100%; width: 0%; background: linear-gradient(90deg, #b48cff, #f0c060);
+            border-radius: 2px; transition: width 0.3s ease;
+        }
+        .collect-orb {
+            position: fixed; cursor: pointer; z-index: 37;
+            font-size: 2rem; user-select: none; pointer-events: all;
+            filter: drop-shadow(0 0 12px rgba(180,140,255,0.6));
+            animation: orbFloat 3s ease-in-out infinite, orbAppear 0.5s ease-out;
+            transition: transform 0.15s ease;
+        }
+        .collect-orb:hover { transform: scale(1.3); filter: drop-shadow(0 0 20px rgba(240,192,96,0.8)); }
+        @keyframes orbFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+        @keyframes orbAppear {
+            from { opacity: 0; transform: scale(0) rotate(-180deg); }
+            to { opacity: 1; transform: scale(1) rotate(0deg); }
+        }
+        .orb-collect-burst {
+            position: fixed; pointer-events: none; z-index: 38;
+            font-size: 1rem; animation: orbBurst 0.6s ease-out forwards;
+        }
+        @keyframes orbBurst {
+            0% { opacity: 1; transform: scale(1); }
+            100% { opacity: 0; transform: scale(2.5) translateY(-30px); }
+        }
+        .collect-complete-banner {
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+            z-index: 38; text-align: center; pointer-events: none;
+            animation: bannerPop 2.5s ease-out forwards;
+        }
+        @keyframes bannerPop {
+            0% { opacity: 0; transform: translate(-50%,-50%) scale(0.3); }
+            15% { opacity: 1; transform: translate(-50%,-50%) scale(1.15); }
+            25% { transform: translate(-50%,-50%) scale(1); }
+            80% { opacity: 1; }
+            100% { opacity: 0; transform: translate(-50%,-50%) scale(1.1) translateY(-20px); }
+        }
+        .collect-complete-banner h2 {
+            font-family: 'Cinzel Decorative', cursive; font-size: 1.6rem;
+            color: #f0c060; text-shadow: 0 0 20px rgba(240,192,96,0.5);
+            margin-bottom: 4px;
+        }
+        .collect-complete-banner p {
+            font-family: 'Cinzel', serif; font-size: 0.65rem;
+            color: rgba(180,140,255,0.7); letter-spacing: 2px; text-transform: uppercase;
+        }
+
+        .collect-hint {
+            position: fixed; bottom: 15%; left: 50%; transform: translateX(-50%);
+            z-index: 36; pointer-events: none;
+            font-family: 'MedievalSharp', cursive; font-size: 0.8rem;
+            color: rgba(200,180,140,0.35); letter-spacing: 1px;
+            animation: promptBlink 2s ease-in-out infinite;
+        }
+
+        /* ═══════ RPG Responsive ═══════ */
+        @media (max-width: 480px) {
+            .rpg-hud { padding: 6px 8px 10px; }
+            .hud-bar-wrap { width: 55px; }
+            .hud-level { font-size: 0.7rem; min-width: 45px; }
+            .hud-row { gap: 8px; }
+            .quest-tracker { display: none !important; }
+            .achievement-toast { min-width: 200px; padding: 8px 12px; }
+            .achieve-name { font-size: 0.75rem; }
+            .levelup-text { font-size: 1.8rem; }
+            .inventory-items { grid-template-columns: repeat(3, 1fr); }
+            .collect-title { font-size: 0.9rem; }
+            .collect-orb { font-size: 1.6rem; }
+            .collect-complete-banner h2 { font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- 1. CINEMATIC INTRO -->
-    <div id="storyIntro">
-        <div>
-            <div class="intro-text" id="introTypewriter"></div>
-            <button id="startBtn" class="start-quest-btn" style="display:none;" onclick="startGame()">Erwachen</button>
+    <div class="bg-layer"></div>
+    <div class="vignette"></div>
+    <div class="particle-container" id="particles"></div>
+    <div id="runeParticles"></div>
+
+    <!-- RPG HUD -->
+    <div class="rpg-hud" id="rpgHud">
+        <div class="hud-row">
+            <div class="hud-group">
+                <span class="hud-icon">⚔️</span>
+                <span class="hud-level" id="hudLevel">LVL 1</span>
+            </div>
+            <div class="hud-group">
+                <span class="hud-icon">❤️</span>
+                <div class="hud-bar-wrap"><div class="hud-bar hp" id="hudHp"></div></div>
+            </div>
+            <div class="hud-group">
+                <span class="hud-icon">💎</span>
+                <div class="hud-bar-wrap"><div class="hud-bar mana" id="hudMana"></div></div>
+            </div>
+            <div class="hud-group">
+                <span class="hud-icon">✨</span>
+                <div class="hud-bar-wrap"><div class="hud-bar xp" id="hudXp"></div></div>
+            </div>
+            <div class="hud-group">
+                <span class="hud-icon">🪙</span>
+                <span class="hud-gold"><span class="hud-gold-val" id="hudGold">0</span></span>
+            </div>
         </div>
     </div>
 
-    <!-- 2. SPIELWELT -->
-    <div class="world" id="world"><div class="mist"></div></div>
-
-    <!-- Kompass -->
-    <div class="compass-ui" id="compass">
-        <svg viewBox="0 0 400 50">
-            <line x1="0" y1="40" x2="400" y2="40" stroke="#c4b67a" stroke-width="2" />
-            <text x="200" y="30" fill="#c4b67a" font-size="20" text-anchor="middle" font-family="Cinzel">▼</text>
-            <text x="200" y="15" fill="#c4b67a" font-size="12" text-anchor="middle">N</text>
-        </svg>
+    <!-- Quest Tracker -->
+    <div class="quest-tracker" id="questTracker">
+        <div class="qt-header">Aktive Quests</div>
+        <div class="qt-item current" id="qtCollect">Magische Essenzen sammeln</div>
+        <div class="qt-item" id="qtMain">Die Frage beantworten</div>
+        <div class="qt-item" id="qtSide">Side Quests abschließen</div>
     </div>
 
-    <!-- Benachrichtigungen -->
-    <div class="notif" id="notif">
-        <div style="color: var(--skyrim-gold); font-size: 0.8rem; letter-spacing: 5px; margin-bottom: 5px;">QUEST AKTUALISIERT</div>
-        <h2 id="notifTitle" style="font-size: 2.2rem; text-shadow: 0 0 10px #000;"></h2>
+    <!-- RPG Overlays -->
+    <div class="achievement-container" id="achieveContainer"></div>
+    <div class="levelup-overlay" id="levelupOverlay">
+        <div style="text-align:center;">
+            <div class="levelup-text" id="levelupText">LEVEL UP!</div>
+            <div class="levelup-sub" id="levelupSub">Level 2 erreicht</div>
+        </div>
+    </div>
+    <div class="loot-popup" id="lootPopup">
+        <div class="loot-title">Beute erhalten</div>
+        <span class="loot-item" id="lootIcon">🗡️</span>
+        <div class="loot-name" id="lootName">Schwert der Wahrheit</div>
+        <div class="loot-rarity rare" id="lootRarity">SELTEN</div>
+    </div>
+    <div class="battle-transition" id="battleTransition">
+        <div class="battle-flash"></div>
+        <div class="battle-lines" id="battleLines"></div>
+    </div>
+    <div class="damage-flash" id="damageFlash"></div>
+
+    <!-- Emoji Collector Mini-Quest -->
+    <div class="collect-overlay" id="collectOverlay">
+        <div class="collect-hud">
+            <div class="collect-title">✨ Sammle die magischen Essenzen ✨</div>
+            <div class="collect-counter"><span class="cc-num" id="collectCount">0</span> / <span class="cc-num" id="collectTotal">8</span></div>
+            <div class="collect-progress-wrap"><div class="collect-progress" id="collectProgress"></div></div>
+        </div>
+        <div class="collect-hint">Klicke auf die leuchtenden Essenzen!</div>
     </div>
 
-    <!-- ITEMS -->
-    <div class="quest-item" id="item1" style="top: 25%; left: 20%;" onclick="collect(1)">
-        <svg viewBox="0 0 100 100"><polygon points="50,5 90,30 90,70 50,95 10,70 10,30" fill="#2ecc71" stroke="#fff" stroke-width="2" /></svg>
-    </div>
-    <div class="quest-item" id="item2" style="top: 60%; left: 75%;" onclick="collect(2)">
-        <svg viewBox="0 0 100 100"><polygon points="50,5 90,30 90,70 50,95 10,70 10,30" fill="#2ecc71" stroke="#fff" stroke-width="2" /></svg>
-    </div>
-    <div class="quest-item" id="item3" style="top: 75%; left: 25%;" onclick="collect(3)">
-        <svg viewBox="0 0 100 100"><polygon points="50,5 90,30 90,70 50,95 10,70 10,30" fill="#2ecc71" stroke="#fff" stroke-width="2" /></svg>
+    <div class="fade-overlay" id="fadeOverlay"></div>
+
+    <div class="quest-notification" id="questNotif">
+        <div class="quest-label">Neue Quest begonnen</div>
+        <div class="quest-title" id="questTitle">Die Quest der Liebe</div>
+        <div class="quest-line"></div>
     </div>
 
-    <!-- MANDY -->
-    <div id="mageContainer">
-        <svg viewBox="0 0 200 400">
-            <path d="M100,50 L160,350 L40,350 Z" fill="#1a1a1a" stroke="#8a2be2" stroke-width="2" />
-            <circle cx="100" cy="80" r="30" fill="#1a1a1a" stroke="#8a2be2" stroke-width="2" />
-            <circle cx="85" cy="80" r="3" fill="#8a2be2"><animate attributeName="opacity" values="0.2;1;0.2" dur="2s" repeatCount="indefinite" /></circle>
-            <circle cx="115" cy="80" r="3" fill="#8a2be2"><animate attributeName="opacity" values="0.2;1;0.2" dur="2s" repeatCount="indefinite" /></circle>
-        </svg>
+    <!-- Intro cinematic -->
+    <div class="intro-screen" id="introScreen">
+        <div class="intro-text" id="introText"></div>
+        <div class="intro-prompt" id="introPrompt">[ Weiter ]</div>
     </div>
 
-    <!-- DIALOG BOX -->
-    <div id="dialogBox">
-        <div class="speaker">Mandy, Erzmagierin der Herzen</div>
-        <div class="dialog-content" id="dialogText"></div>
-        <div id="dialogOptions"></div>
+    <!-- Main game -->
+    <div class="game-area" id="gameArea">
+        <!-- Boss HP Bar -->
+        <div class="boss-bar-wrap" id="bossBar">
+            <div class="boss-bar-label">Boss Encounter</div>
+            <div class="boss-bar-name">❤️ Die Frage des Schicksals</div>
+            <div class="boss-bar-outer"><div class="boss-bar-inner" id="bossHp"></div></div>
+        </div>
+        <div class="mage-scene">
+            <span class="mage-sprite">🧙‍♂️</span>
+            <div class="mage-name">Magier Mandarius</div>
+        </div>
+        <div class="dialog-box">
+            <span class="corner corner-tl"></span>
+            <span class="corner corner-tr"></span>
+            <span class="corner corner-bl"></span>
+            <span class="corner corner-br"></span>
+            <div class="dialog-text" id="dialogText"></div>
+            <div class="choices" id="mainChoices">
+                <button class="choice-btn" id="btnJa" onclick="handleJa()">
+                    <span class="choice-num">[1]</span> Ja! Bei allen Göttern, ja! ⚔️
+                    <span class="mana-cost">💎 30</span>
+                </button>
+                <button class="choice-btn choice-nein" id="btnNein">
+                    <span class="choice-num">[2]</span> Nein... ich muss ablehnen 🛡️
+                    <span class="mana-cost">💎 0</span>
+                </button>
+                <button class="choice-btn" id="btnVielleicht" onclick="handleVielleicht()">
+                    <span class="choice-num">[3]</span> Hmm... ich bin mir nicht sicher 🔮
+                    <span class="mana-cost">💎 20</span>
+                </button>
+            </div>
+        </div>
     </div>
 
-    <!-- SUCCESS -->
-    <div id="levelUp">
-        <p style="letter-spacing: 8px;">STUFENAUFSTIEG</p>
-        <h1 style="font-size: 5rem;">LIEBE 100</h1>
-        <h2>Lilith & Mandy</h2>
+    <div class="celebration-overlay" id="celebrationOverlay"></div>
+    <div class="crying-overlay" id="cryingOverlay"></div>
+
+    <div class="quiz-overlay" id="quizOverlay">
+        <div class="quiz-card">
+            <span class="corner corner-tl"></span><span class="corner corner-tr"></span>
+            <span class="corner corner-bl"></span><span class="corner corner-br"></span>
+            <span class="quiz-npc" id="quizEmoji">🧝‍♀️</span>
+            <div class="quiz-question" id="quizQuestion"></div>
+            <div class="quiz-buttons">
+                <button class="quiz-btn quiz-btn-ja" id="quizBtnJa">Ja</button>
+                <button class="quiz-btn quiz-btn-nein" id="quizBtnNein">Nein</button>
+            </div>
+        </div>
     </div>
 
-    <!-- ADMIN LOGBUCH BUTTON & MODAL -->
-    <button id="logBtn" onclick="toggleLog()">[LOG]</button>
-    <div id="logModal">
-        <h2 style="color:var(--skyrim-gold)">Quest-Logbuch (Liliths Aktionen)</h2>
-        <button onclick="toggleLog()" style="float:right; padding:5px;">Schließen</button>
-        <div id="logContent" style="margin-top:20px;"></div>
-        <button onclick="clearLog()" style="margin-top:30px; color:red; background:none; border:none; cursor:pointer;">Protokoll löschen</button>
+    <div class="success-screen" id="successScreen">
+        <div class="success-content">
+            <span class="big-icon">💖⚔️💖</span>
+            <h1>Ich liebe dich, Lilith!</h1>
+            <p>Die Quest wurde erfolgreich abgeschlossen.</p>
+            <div class="quest-complete">✦ Quest Complete ✦</div>
+        </div>
     </div>
 
-    <script>
-        // --- LOGBUCH SYSTEM ---
-        function track(event, info = "") {
-            const data = JSON.parse(localStorage.getItem('skyrim_antrag_log') || '[]');
-            data.push({ time: new Date().toLocaleTimeString(), event, info });
-            localStorage.setItem('skyrim_antrag_log', JSON.stringify(data));
+    <!-- Inventory -->
+    <button class="inventory-btn" id="invBtn" onclick="showInventory()">🎒</button>
+    <div class="inventory-overlay" id="inventoryOverlay">
+        <div class="inventory-card">
+            <button class="inventory-close" onclick="closeInventory()">✕</button>
+            <h2>🎒 Inventar</h2>
+            <div class="inventory-stats" id="invStats"></div>
+            <div class="inventory-items" id="invItems"></div>
+        </div>
+    </div>
+
+    <button class="results-btn" onclick="showResults()">📜</button>
+    <div class="results-overlay" id="resultsOverlay">
+        <div class="results-card">
+            <button class="results-close" onclick="closeResults()">✕</button>
+            <h2>⚔️ Quest-Chronik</h2>
+            <ul class="results-list" id="resultsList"></ul>
+            <button class="results-clear" onclick="clearResults()">Chronik löschen</button>
+        </div>
+    </div>
+
+<script>
+// ════════════ RPG STATE ════════════
+const rpg = {
+    level: 1, xp: 0, xpToNext: 100,
+    hp: 100, maxHp: 100,
+    mana: 80, maxMana: 80,
+    gold: 0,
+    stats: { str: 5, int: 8, wis: 7, cha: 12, lck: 6 },
+    inventory: [],
+    achievements: new Set(),
+    questsComplete: 0
+};
+
+// ════════════ SOUND SYSTEM (Web Audio API) ════════════
+let audioCtx;
+function ensureAudio() { if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+function playTone(freq, duration, type = 'sine', volume = 0.08) {
+    try {
+        ensureAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + duration);
+    } catch(e) {}
+}
+function sfxClick() { playTone(800, 0.08, 'square', 0.03); }
+function sfxXP() { setTimeout(() => playTone(600, 0.12, 'sine', 0.05), 0); setTimeout(() => playTone(900, 0.18, 'sine', 0.04), 80); }
+function sfxLevelUp() { [523, 659, 784, 1047].forEach((f,i) => setTimeout(() => playTone(f, 0.3, 'sine', 0.07), i * 100)); }
+function sfxLoot() { playTone(440, 0.1, 'triangle', 0.05); setTimeout(() => playTone(660, 0.15, 'triangle', 0.05), 100); }
+function sfxAchieve() { playTone(880, 0.2, 'sine', 0.04); setTimeout(() => playTone(1100, 0.3, 'sine', 0.04), 150); }
+function sfxBattle() { playTone(200, 0.3, 'sawtooth', 0.05); setTimeout(() => playTone(300, 0.4, 'square', 0.03), 100); }
+function sfxHeal() { playTone(500, 0.15, 'sine', 0.04); setTimeout(() => playTone(700, 0.2, 'sine', 0.03), 100); }
+function sfxDamage() { playTone(150, 0.2, 'sawtooth', 0.06); }
+function sfxGold() { playTone(1200, 0.08, 'square', 0.03); setTimeout(() => playTone(1500, 0.1, 'square', 0.02), 60); }
+
+// ════════════ HUD UPDATE ════════════
+function updateHUD() {
+    document.getElementById('hudLevel').textContent = 'LVL ' + rpg.level;
+    document.getElementById('hudHp').style.width = (rpg.hp / rpg.maxHp * 100) + '%';
+    document.getElementById('hudMana').style.width = (rpg.mana / rpg.maxMana * 100) + '%';
+    document.getElementById('hudXp').style.width = (rpg.xp / rpg.xpToNext * 100) + '%';
+    document.getElementById('hudGold').textContent = rpg.gold;
+}
+
+// ════════════ XP & LEVEL UP ════════════
+function gainXP(amount) {
+    rpg.xp += amount;
+    sfxXP();
+    spawnFloatText('+' + amount + ' XP', 'xp');
+    while (rpg.xp >= rpg.xpToNext) {
+        rpg.xp -= rpg.xpToNext;
+        rpg.level++;
+        rpg.xpToNext = Math.floor(rpg.xpToNext * 1.5);
+        rpg.maxHp += 10; rpg.hp = rpg.maxHp;
+        rpg.maxMana += 5; rpg.mana = rpg.maxMana;
+        rpg.stats.str++; rpg.stats.int++; rpg.stats.wis++;
+        rpg.stats.cha++; rpg.stats.lck++;
+        showLevelUp();
+    }
+    updateHUD();
+    checkAchievements();
+}
+
+function addGold(amount) {
+    rpg.gold += amount;
+    sfxGold();
+    spawnFloatText('+' + amount + ' Gold', 'gold');
+    updateHUD();
+    checkAchievements();
+}
+
+function useMana(amount) {
+    if (rpg.mana >= amount) {
+        rpg.mana -= amount;
+        updateHUD();
+        return true;
+    }
+    spawnFloatText('Nicht genug Mana!', 'damage');
+    return false;
+}
+
+function healHP(amount) {
+    rpg.hp = Math.min(rpg.maxHp, rpg.hp + amount);
+    sfxHeal();
+    spawnFloatText('+' + amount + ' HP', 'heal');
+    updateHUD();
+}
+
+function showLevelUp() {
+    sfxLevelUp();
+    const ov = document.getElementById('levelupOverlay');
+    document.getElementById('levelupText').textContent = 'LEVEL UP!';
+    document.getElementById('levelupSub').textContent = 'Level ' + rpg.level + ' erreicht';
+    ov.classList.add('active');
+    screenShake();
+    spellBurstEffect(window.innerWidth / 2, window.innerHeight / 2, '#f0c060');
+    setTimeout(() => ov.classList.remove('active'), 2400);
+}
+
+// ════════════ FLOATING TEXT ════════════
+function spawnFloatText(text, type = 'xp', x, y) {
+    const el = document.createElement('div');
+    el.className = 'float-text ' + type;
+    el.textContent = text;
+    if (!x) x = window.innerWidth / 2 + (Math.random() - 0.5) * 200;
+    if (!y) y = window.innerHeight / 2 + (Math.random() - 0.5) * 100;
+    el.style.left = x + 'px';
+    el.style.top = y + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2000);
+}
+
+// ════════════ SCREEN SHAKE ════════════
+function screenShake() {
+    document.body.classList.add('screen-shake');
+    setTimeout(() => document.body.classList.remove('screen-shake'), 400);
+}
+
+// ════════════ SPELL BURST ════════════
+function spellBurstEffect(x, y, color = '#b48cff') {
+    for (let i = 0; i < 8; i++) {
+        const p = document.createElement('div');
+        p.className = 'spell-burst';
+        const size = 10 + Math.random() * 20;
+        p.style.width = size + 'px'; p.style.height = size + 'px';
+        p.style.left = (x + (Math.random() - 0.5) * 80) + 'px';
+        p.style.top = (y + (Math.random() - 0.5) * 80) + 'px';
+        p.style.background = 'radial-gradient(circle, ' + color + ', transparent)';
+        p.style.animationDelay = (i * 0.05) + 's';
+        document.body.appendChild(p);
+        setTimeout(() => p.remove(), 1000);
+    }
+}
+
+// ════════════ DAMAGE FLASH ════════════
+function damageFlash() {
+    const f = document.getElementById('damageFlash');
+    f.classList.add('active');
+    setTimeout(() => f.classList.remove('active'), 150);
+}
+
+// ════════════ LOOT SYSTEM ════════════
+const lootTable = [
+    { icon: '🗡️', name: 'Schwert der Wahrheit', rarity: 'rare' },
+    { icon: '🛡️', name: 'Schild des Vertrauens', rarity: 'uncommon' },
+    { icon: '💍', name: 'Ring der ewigen Liebe', rarity: 'legendary' },
+    { icon: '📜', name: 'Schriftrolle der Weisheit', rarity: 'common' },
+    { icon: '🧪', name: 'Trank der Zuneigung', rarity: 'uncommon' },
+    { icon: '🔮', name: 'Kristallkugel des Schicksals', rarity: 'epic' },
+    { icon: '👑', name: 'Krone der Zusammengehörigkeit', rarity: 'legendary' },
+    { icon: '🪄', name: 'Zauberstab der Funken', rarity: 'rare' },
+    { icon: '⚗️', name: 'Elixier der Schmetterlinge', rarity: 'epic' },
+    { icon: '🎵', name: 'Melodie der Herzen', rarity: 'rare' },
+    { icon: '🌹', name: 'Ewige Rose', rarity: 'uncommon' },
+    { icon: '💎', name: 'Diamant der Treue', rarity: 'epic' },
+    { icon: '🗝️', name: 'Schlüssel zum Herzen', rarity: 'legendary' },
+    { icon: '🧣', name: 'Schal der Wärme', rarity: 'common' },
+    { icon: '⭐', name: 'Stern der Hoffnung', rarity: 'rare' },
+    { icon: '🏹', name: 'Amors Bogen', rarity: 'epic' },
+];
+const rarityLabels = { common: 'GEWÖHNLICH', uncommon: 'UNGEWÖHNLICH', rare: 'SELTEN', epic: 'EPISCH', legendary: 'LEGENDÄR' };
+const rarityGold = { common: 5, uncommon: 15, rare: 30, epic: 50, legendary: 100 };
+
+function dropLoot(forceRarity) {
+    let available = lootTable.filter(l => !rpg.inventory.find(i => i.name === l.name));
+    if (forceRarity) available = available.filter(l => l.rarity === forceRarity);
+    if (!available.length) available = lootTable.filter(l => !rpg.inventory.find(i => i.name === l.name));
+    if (!available.length) return;
+    const item = available[Math.floor(Math.random() * available.length)];
+    rpg.inventory.push(item);
+    rpg.gold += rarityGold[item.rarity];
+    sfxLoot();
+    const popup = document.getElementById('lootPopup');
+    document.getElementById('lootIcon').textContent = item.icon;
+    document.getElementById('lootName').textContent = item.name;
+    const rarityEl = document.getElementById('lootRarity');
+    rarityEl.textContent = rarityLabels[item.rarity];
+    rarityEl.className = 'loot-rarity ' + item.rarity;
+    popup.classList.add('active');
+    spawnFloatText('+' + rarityGold[item.rarity] + ' Gold', 'gold');
+    setTimeout(() => { popup.classList.remove('active'); updateHUD(); }, 2500);
+}
+
+// ════════════ ACHIEVEMENTS ════════════
+const achievementDefs = {
+    first_step: { icon: '🏆', name: 'Erste Schritte' },
+    lover: { icon: '💖', name: 'Wahre Liebe' },
+    explorer: { icon: '🗺️', name: 'Entdecker' },
+    scholar: { icon: '📚', name: 'Gelehrter' },
+    collector: { icon: '💰', name: 'Sammler' },
+    rich: { icon: '👑', name: 'Wohlhabend' },
+    persistent: { icon: '🔥', name: 'Beharrlich' },
+    max_level: { icon: '⚡', name: 'Meister' },
+    dragon_slayer: { icon: '🐉', name: 'Drachenreiter' },
+};
+function unlockAchievement(id) {
+    if (rpg.achievements.has(id)) return;
+    rpg.achievements.add(id);
+    const def = achievementDefs[id];
+    if (!def) return;
+    sfxAchieve();
+    const toast = document.createElement('div');
+    toast.className = 'achievement-toast';
+    toast.innerHTML = '<span class="achieve-icon">' + def.icon + '</span><div class="achieve-info"><span class="achieve-label">Erfolg freigeschaltet</span><span class="achieve-name">' + def.name + '</span></div>';
+    document.getElementById('achieveContainer').appendChild(toast);
+    setTimeout(() => toast.remove(), 3800);
+}
+function checkAchievements() {
+    if (rpg.inventory.length >= 5) unlockAchievement('collector');
+    if (rpg.gold >= 100) unlockAchievement('rich');
+    if (rpg.level >= 5) unlockAchievement('max_level');
+}
+
+// ════════════ BATTLE TRANSITION ════════════
+function battleTransition() {
+    return new Promise(resolve => {
+        sfxBattle();
+        screenShake();
+        const bt = document.getElementById('battleTransition');
+        const lines = document.getElementById('battleLines');
+        lines.innerHTML = '';
+        for (let i = 0; i < 5; i++) {
+            const line = document.createElement('div');
+            line.className = 'battle-line';
+            line.style.top = (15 + i * 18) + '%';
+            line.style.left = '-10%';
+            line.style.transform = 'rotate(' + ((Math.random() - 0.5) * 30) + 'deg)';
+            line.style.animationDelay = (i * 0.06) + 's';
+            lines.appendChild(line);
         }
+        bt.classList.add('active');
+        damageFlash();
+        setTimeout(() => { bt.classList.remove('active'); resolve(); }, 900);
+    });
+}
 
-        function toggleLog() {
-            const m = document.getElementById('logModal');
-            if(m.style.display === 'block') { m.style.display = 'none'; }
-            else {
-                const data = JSON.parse(localStorage.getItem('skyrim_antrag_log') || '[]');
-                document.getElementById('logContent').innerHTML = data.map(d => `
-                    <div class="log-entry">
-                        <strong>[${d.time}]</strong> ${d.event} <br> 
-                        <span style="color:var(--skyrim-gold)">${d.info}</span>
-                    </div>
-                `).join('') || "Noch keine Aktionen aufgezeichnet.";
-                m.style.display = 'block';
-            }
+// ════════════ INVENTORY UI ════════════
+function showInventory() {
+    const ov = document.getElementById('inventoryOverlay');
+    ov.classList.add('active');
+    sfxClick();
+    document.getElementById('invStats').innerHTML =
+        '<div class="stat-item"><span>STR</span><span class="stat-val">' + rpg.stats.str + '</span></div>' +
+        '<div class="stat-item"><span>INT</span><span class="stat-val">' + rpg.stats.int + '</span></div>' +
+        '<div class="stat-item"><span>WIS</span><span class="stat-val">' + rpg.stats.wis + '</span></div>' +
+        '<div class="stat-item"><span>CHA</span><span class="stat-val">' + rpg.stats.cha + '</span></div>' +
+        '<div class="stat-item"><span>LCK</span><span class="stat-val">' + rpg.stats.lck + '</span></div>' +
+        '<div class="stat-item"><span>LVL</span><span class="stat-val">' + rpg.level + '</span></div>';
+    let html = '';
+    for (let i = 0; i < 12; i++) {
+        if (rpg.inventory[i]) {
+            const item = rpg.inventory[i];
+            html += '<div class="inv-slot"><span class="inv-tooltip">' + item.name + '</span>' + item.icon + '</div>';
+        } else {
+            html += '<div class="inv-slot empty">\u00b7</div>';
         }
+    }
+    document.getElementById('invItems').innerHTML = html;
+}
+function closeInventory() { document.getElementById('inventoryOverlay').classList.remove('active'); }
+document.getElementById('inventoryOverlay').addEventListener('click', e => { if (e.target === e.currentTarget) closeInventory(); });
 
-        function clearLog() {
-            localStorage.removeItem('skyrim_antrag_log');
-            toggleLog();
-        }
+// ════════════ QUEST TRACKER ════════════
+function updateQuestTracker(mainDone, sideDone) {
+    const main = document.getElementById('qtMain');
+    const side = document.getElementById('qtSide');
+    if (mainDone) { main.classList.add('complete'); main.classList.remove('current'); }
+    if (sideDone) { side.classList.add('complete'); }
+}
 
-        // --- GAME LOGIK ---
-        const introString = "In einer Welt voller ungeschriebener Pfade begegneten sich zwei Seelen. Lilith... deine Reise hat dich weit geführt, doch das wichtigste Kapitel beginnt genau hier. Finde die Fragmente der Hoffnung, um die Wahrheit zu erfahren.";
-        let itemsCollected = 0;
+// ════════════ EMOJI COLLECTOR MINI-QUEST ════════════
+const collectEmojis = ['💜','⭐','🔮','💎','🌙','✨','🦋','🌺','💫','🪻','🔥','❄️','🍀','🎭','💠','🫧'];
+const COLLECT_TOTAL = 8;
+let collectGathered = 0;
+let collectResolve = null;
 
-        window.onload = () => {
-            track("Spiel geladen", "Lilith hat die Seite geöffnet");
-            startIntro();
-        };
+function startCollectQuest() {
+    return new Promise(resolve => {
+        collectResolve = resolve;
+        collectGathered = 0;
+        const ov = document.getElementById('collectOverlay');
+        ov.classList.add('active');
+        document.getElementById('collectCount').textContent = '0';
+        document.getElementById('collectTotal').textContent = COLLECT_TOTAL;
+        document.getElementById('collectProgress').style.width = '0%';
 
-        function startIntro() {
-            let i = 0;
-            const el = document.getElementById('introTypewriter');
-            function type() {
-                if (i < introString.length) {
-                    el.innerHTML += introString.charAt(i); i++;
-                    setTimeout(type, 50);
-                } else { document.getElementById('startBtn').style.display = 'inline-block'; }
-            }
-            type();
-        }
+        // Quest notification
+        document.getElementById('questTitle').textContent = 'Magische Essenzen sammeln';
+        const n = document.getElementById('questNotif');
+        n.querySelector('.quest-label').textContent = 'Neue Quest begonnen';
+        n.classList.add('show');
+        setTimeout(() => n.classList.remove('show'), 3500);
 
-        function startGame() {
-            track("Quest gestartet", "Intro beendet, Spielwelt betreten");
-            document.getElementById('storyIntro').style.display = 'none';
-            document.getElementById('world').style.display = 'block';
-            document.getElementById('compass').style.display = 'block';
-            showNotif("Sammle die 3 Smaragde der Hoffnung");
-            document.querySelectorAll('.quest-item').forEach(el => el.style.display = 'block');
-        }
+        // Spawn orbs with staggered timing
+        const shuffled = collectEmojis.sort(() => Math.random() - 0.5).slice(0, COLLECT_TOTAL);
+        shuffled.forEach((emoji, i) => {
+            setTimeout(() => spawnCollectOrb(emoji), 300 + i * 350);
+        });
+    });
+}
 
-        function showNotif(title) {
-            const n = document.getElementById('notif');
-            document.getElementById('notifTitle').textContent = title;
-            n.classList.remove('active');
-            void n.offsetWidth;
-            n.classList.add('active');
-        }
+function spawnCollectOrb(emoji) {
+    const orb = document.createElement('span');
+    orb.className = 'collect-orb';
+    orb.textContent = emoji;
+    // Random position (avoid HUD area top 60px)
+    const pad = 60;
+    orb.style.left = (pad + Math.random() * (window.innerWidth - pad * 2)) + 'px';
+    orb.style.top = (80 + Math.random() * (window.innerHeight - 180)) + 'px';
+    // Randomize float animation offset
+    orb.style.animationDelay = (Math.random() * 2) + 's, 0s';
+    document.getElementById('collectOverlay').appendChild(orb);
 
-        function collect(id) {
-            itemsCollected++;
-            track("Smaragd gefunden", `Smaragd Nr. ${itemsCollected} eingesammelt`);
-            document.getElementById('item' + id).style.display = 'none';
-            if (itemsCollected < 3) {
-                showNotif(`Smaragde gefunden: ${itemsCollected}/3`);
+    orb.addEventListener('click', (e) => {
+        e.stopPropagation();
+        collectOrb(orb, e);
+    });
+    orb.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        collectOrb(orb, e.touches[0]);
+    }, { passive: false });
+}
+
+function collectOrb(orb, e) {
+    if (orb.dataset.collected) return;
+    orb.dataset.collected = '1';
+
+    const rect = orb.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    // Burst effect
+    for (let i = 0; i < 4; i++) {
+        const burst = document.createElement('span');
+        burst.className = 'orb-collect-burst';
+        burst.textContent = orb.textContent;
+        burst.style.left = (cx + (Math.random() - 0.5) * 40) + 'px';
+        burst.style.top = (cy + (Math.random() - 0.5) * 40) + 'px';
+        document.body.appendChild(burst);
+        setTimeout(() => burst.remove(), 700);
+    }
+
+    // Sound & XP
+    sfxGold();
+    gainXP(10);
+    addGold(5);
+    spellBurstEffect(cx, cy, '#b48cff');
+
+    // Remove orb
+    orb.style.transition = 'all 0.3s ease';
+    orb.style.transform = 'scale(0) rotate(180deg)';
+    orb.style.opacity = '0';
+    setTimeout(() => orb.remove(), 350);
+
+    // Update counter
+    collectGathered++;
+    document.getElementById('collectCount').textContent = collectGathered;
+    document.getElementById('collectProgress').style.width = (collectGathered / COLLECT_TOTAL * 100) + '%';
+
+    if (collectGathered >= COLLECT_TOTAL) {
+        finishCollectQuest();
+    }
+}
+
+function finishCollectQuest() {
+    const ov = document.getElementById('collectOverlay');
+
+    // Banner
+    const banner = document.createElement('div');
+    banner.className = 'collect-complete-banner';
+    banner.innerHTML = '<h2>✨ Essenzen gesammelt! ✨</h2><p>Miniquest abgeschlossen</p>';
+    ov.appendChild(banner);
+
+    sfxLevelUp();
+    screenShake();
+    gainXP(50);
+    addGold(30);
+    spellBurstEffect(window.innerWidth / 2, window.innerHeight / 2, '#f0c060');
+
+    // Update quest tracker
+    const qtCollect = document.getElementById('qtCollect');
+    qtCollect.classList.add('complete');
+    qtCollect.classList.remove('current');
+    document.getElementById('qtMain').classList.add('current');
+
+    // Quest complete notification
+    setTimeout(() => {
+        document.getElementById('questTitle').textContent = 'Miniquest abgeschlossen!';
+        const n = document.getElementById('questNotif');
+        n.querySelector('.quest-label').textContent = 'Quest abgeschlossen';
+        n.classList.add('show');
+        setTimeout(() => n.classList.remove('show'), 3000);
+    }, 500);
+
+    setTimeout(() => {
+        ov.classList.remove('active');
+        ov.innerHTML = `<div class="collect-hud">
+            <div class="collect-title">✨ Sammle die magischen Essenzen ✨</div>
+            <div class="collect-counter"><span class="cc-num" id="collectCount">0</span> / <span class="cc-num" id="collectTotal">8</span></div>
+            <div class="collect-progress-wrap"><div class="collect-progress" id="collectProgress"></div></div>
+        </div>
+        <div class="collect-hint">Klicke auf die leuchtenden Essenzen!</div>`;
+        if (collectResolve) { collectResolve(); collectResolve = null; }
+    }, 2500);
+}
+
+// ════════════ TRACKING ════════════
+const TRACKING_WEBHOOK = '';
+function trackEvent(action, extra = {}) {
+    const ev = { action, timestamp: new Date().toISOString(), userAgent: navigator.userAgent, ...extra };
+    try {
+        const l = JSON.parse(localStorage.getItem('willstdu_log') || '[]');
+        l.push(ev);
+        localStorage.setItem('willstdu_log', JSON.stringify(l));
+    } catch (e) {}
+    if (TRACKING_WEBHOOK) {
+        try { navigator.sendBeacon(TRACKING_WEBHOOK, JSON.stringify(ev)); } catch (e) {}
+    }
+}
+trackEvent('page_loaded');
+
+// ════════════ RESULTS MODAL ════════════
+const actionLabels = {
+    page_loaded: { icon: '🌐', label: 'Quest gestartet' },
+    ja_clicked: { icon: '⚔️', label: 'JA gewählt!' },
+    nein_escaped: { icon: '🏃', label: 'Nein ist geflohen' },
+    nein_clicked: { icon: '💔', label: 'Nein erwischt' },
+    nein_retry: { icon: '🔄', label: 'Neue Chance' },
+    vielleicht_clicked: { icon: '🔮', label: 'Vielleicht gewählt' },
+    quiz_ja: { icon: '✅', label: 'Prüfung: Ja' },
+    quiz_nein: { icon: '❌', label: 'Prüfung: Nein' }
+};
+
+function showResults() {
+    const o = document.getElementById('resultsOverlay');
+    const l = document.getElementById('resultsList');
+    o.classList.add('active');
+    let log = [];
+    try { log = JSON.parse(localStorage.getItem('willstdu_log') || '[]'); } catch (e) {}
+    if (!log.length) { l.innerHTML = '<li class="results-empty">Noch keine Einträge.</li>'; return; }
+    l.innerHTML = log.map(e => {
+        const i = actionLabels[e.action] || { icon: '❓', label: e.action };
+        const t = new Date(e.timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        let x = '';
+        if (e.escapeCount) x = ` (#${e.escapeCount})`;
+        if (e.question) x = ` — ${e.question.substring(0, 35)}…`;
+        return `<li><span class="result-icon">${i.icon}</span><span class="result-action">${i.label}${x}</span><span class="result-time">${t}</span></li>`;
+    }).join('');
+}
+
+function closeResults() { document.getElementById('resultsOverlay').classList.remove('active'); }
+function clearResults() {
+    localStorage.removeItem('willstdu_log');
+    document.getElementById('resultsList').innerHTML = '<li class="results-empty">Chronik gelöscht.</li>';
+}
+document.getElementById('resultsOverlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeResults();
+});
+
+// ════════════ MAGIC PARTICLES ════════════
+const pCont = document.getElementById('particles');
+const pColors = ['#b48cff', '#8a6cdf', '#c9a0ff', '#7c5cbf', '#d4a0ff'];
+
+function mkParticle() {
+    const p = document.createElement('div');
+    p.className = 'magic-particle';
+    const c = pColors[Math.floor(Math.random() * pColors.length)];
+    const s = 2 + Math.random() * 4;
+    p.style.width = s + 'px';
+    p.style.height = s + 'px';
+    p.style.background = c;
+    p.style.boxShadow = `0 0 ${s * 2}px ${c}`;
+    p.style.left = Math.random() * 100 + '%';
+    p.style.animationDuration = (8 + Math.random() * 12) + 's';
+    p.style.animationDelay = Math.random() * 5 + 's';
+    pCont.appendChild(p);
+    setTimeout(() => p.remove(), 25000);
+}
+for (let i = 0; i < 25; i++) setTimeout(mkParticle, i * 200);
+setInterval(mkParticle, 1200);
+
+// ════════════ RUNE PARTICLES (Mandy + Lilith) ════════════
+const rCont = document.getElementById('runeParticles');
+const rTexts = ['Mandy ✦ Lilith', 'M + L', '✦ M&L ✦', 'Mandy ♥ Lilith'];
+
+function mkRune() {
+    const p = document.createElement('span');
+    p.className = 'rune-particle';
+    p.textContent = rTexts[Math.floor(Math.random() * rTexts.length)];
+    p.style.left = Math.random() * 100 + '%';
+    p.style.top = Math.random() * 100 + '%';
+    p.style.fontSize = (0.6 + Math.random() * 0.4) + 'rem';
+    p.style.setProperty('--dx', (Math.random() - 0.5) * 200 + 'px');
+    p.style.setProperty('--dy', (Math.random() - 0.5) * 200 + 'px');
+    p.style.animationDuration = (12 + Math.random() * 15) + 's';
+    rCont.appendChild(p);
+    setTimeout(() => p.remove(), 30000);
+}
+for (let i = 0; i < 12; i++) setTimeout(mkRune, i * 600);
+setInterval(mkRune, 2500);
+
+// ════════════ TYPEWRITER ════════════
+function typeWriter(el, text, speed = 35) {
+    return new Promise(resolve => {
+        el.innerHTML = '';
+        let i = 0;
+        const cur = document.createElement('span');
+        cur.className = 'typing-cursor';
+
+        function tick() {
+            if (i < text.length) {
+                if (text[i] === '<') {
+                    const end = text.indexOf('>', i);
+                    if (end !== -1) {
+                        i = end + 1;
+                        el.innerHTML = text.substring(0, i);
+                        el.appendChild(cur);
+                        setTimeout(tick, 0);
+                        return;
+                    }
+                }
+                i++;
+                el.innerHTML = text.substring(0, i);
+                el.appendChild(cur);
+                setTimeout(tick, speed);
             } else {
-                showNotif("Quest abgeschlossen: Erscheine vor der Erzmagierin");
-                setTimeout(triggerMandy, 2000);
+                setTimeout(() => { cur.remove(); resolve(); }, 500);
             }
         }
+        tick();
+    });
+}
 
-        function triggerMandy() {
-            track("Magierin erschienen", "Dialog beginnt");
-            document.getElementById('world').style.filter = "brightness(0.2) blur(8px)";
-            document.getElementById('mageContainer').style.display = 'block';
-            document.getElementById('dialogBox').style.display = 'block';
-            typeDialog("Du hast Mut bewiesen, Lilith. Die Smaragde leuchten in deiner Gegenwart...", () => {
-                setTimeout(() => {
-                    typeDialog("Doch nun stellt sich die Frage, die unser Schicksal besiegeln wird: Willst du deine Mandy als Partnerin haben?", () => {
-                        askTheQuestion();
-                    });
-                }, 1500);
-            });
-        }
+// ════════════ INTRO CINEMATIC ════════════
+const introSteps = [
+    "Du wanderst durch einen dunklen, uralten Wald...\nDie Bäume flüstern alte Geheimnisse.",
+    "In der Ferne siehst du ein mystisches, violettes Leuchten...\nEtwas zieht dich unwiderstehlich an.",
+    "Du betrittst eine Lichtung.\nEin alter Magier steht dort, umgeben von magischem Licht.",
+    "Er blickt dich an und spricht:\n\n\"Ah, du bist es... Lilith.\nIch habe lange auf dich gewartet.\"",
+    "\"Ich trage eine Botschaft für dich.\nEine Frage, die dein Schicksal verändern wird...\""
+];
 
-        function typeDialog(text, callback) {
-            const el = document.getElementById('dialogText');
-            el.innerHTML = ""; let i = 0;
-            const interval = setInterval(() => {
-                el.innerHTML += text.charAt(i); i++;
-                if (i >= text.length) { clearInterval(interval); if (callback) callback(); }
-            }, 50);
-        }
+let introIdx = 0;
+const introText = document.getElementById('introText');
+const introPrompt = document.getElementById('introPrompt');
+const introScreen = document.getElementById('introScreen');
 
-        function askTheQuestion() {
-            const options = document.getElementById('dialogOptions');
-            options.innerHTML = `
-                <button class="btn" onclick="victory()">[Überreden] Ja, ich will! 💕</button>
-                <button class="btn" id="runBtn" onmouseenter="runAway()">[Weglaufen] Nein, ich bin noch nicht so weit...</button>
-                <button class="btn" onclick="showReward()">[Feilschen] Welche Belohnung erwartet mich?</button>
-            `;
-        }
+async function showIntroStep() {
+    introPrompt.classList.remove('visible');
+    introText.classList.remove('visible');
+    await new Promise(r => setTimeout(r, 300));
+    introText.textContent = '';
+    introText.classList.add('visible');
+    await typeWriter(introText, introSteps[introIdx], 38);
+    await new Promise(r => setTimeout(r, 400));
+    introPrompt.classList.add('visible');
+}
 
-        let escapes = 0;
-        function runAway() {
-            escapes++;
-            track("Fluchtversuch", `Lilith hat ${escapes} Mal versucht 'Nein' zu klicken`);
-            const btn = document.getElementById('runBtn');
-            btn.style.position = 'fixed';
-            btn.style.left = Math.random() * 70 + 15 + '%';
-            btn.style.top = Math.random() * 50 + 20 + '%';
-        }
+let introLocked = false;
+function advanceIntro() {
+    if (introLocked) return;
+    if (!introPrompt.classList.contains('visible')) return;
+    introLocked = true;
+    introIdx++;
+    if (introIdx < introSteps.length) {
+        showIntroStep().then(() => { introLocked = false; });
+    } else {
+        transitionToGame();
+    }
+}
 
-        function showReward() {
-            track("Gefeilscht", "Nach Belohnung gefragt");
-            typeDialog("Ein Leben voller Liebe, Abenteuer und unzähliger gemeinsamer Quest-Belohnungen. Also...?", askTheQuestion);
-        }
+introScreen.addEventListener('click', advanceIntro);
+document.addEventListener('keydown', e => {
+    if (introScreen.classList.contains('hidden')) return;
+    if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); advanceIntro(); }
+});
 
-        function victory() {
-            track("JA GEKLICKT", "Lilith hat den Antrag angenommen!");
-            document.getElementById('levelUp').style.display = 'flex';
-        }
-    </script>
+async function transitionToGame() {
+    const fade = document.getElementById('fadeOverlay');
+    fade.classList.add('active');
+    await new Promise(r => setTimeout(r, 1000));
+    introScreen.classList.add('hidden');
+    document.getElementById('gameArea').classList.add('active');
+
+    // Activate RPG HUD & UI
+    document.getElementById('rpgHud').classList.add('active');
+    document.getElementById('questTracker').classList.add('active');
+    document.getElementById('invBtn').classList.add('active');
+    document.getElementById('bossBar').classList.add('active');
+    updateHUD();
+
+    fade.classList.remove('active');
+    await new Promise(r => setTimeout(r, 600));
+
+    // Skyrim-style quest notification
+    const notif = document.getElementById('questNotif');
+    notif.classList.add('show');
+    setTimeout(() => notif.classList.remove('show'), 4000);
+
+    // RPG: Welcome XP + Achievement
+    await new Promise(r => setTimeout(r, 500));
+    gainXP(25);
+    unlockAchievement('first_step');
+
+    await new Promise(r => setTimeout(r, 800));
+
+    // Start emoji collector mini-quest
+    await startCollectQuest();
+
+    // After collecting, transition to main dialog
+    dropLoot('common');
+    await new Promise(r => setTimeout(r, 1500));
+    await typeMainDialog();
+}
+
+async function typeMainDialog() {
+    const dt = document.getElementById('dialogText');
+    const ch = document.getElementById('mainChoices');
+    ch.classList.remove('visible');
+    await typeWriter(dt, '<span class="hl">Lilith</span>, willst du mit mir gehen? ✨', 42);
+    await new Promise(r => setTimeout(r, 400));
+    ch.classList.add('visible');
+}
+
+// Start intro
+setTimeout(() => showIntroStep().then(() => { introLocked = false; }), 600);
+
+// ════════════ JA ════════════
+function handleJa() {
+    trackEvent('ja_clicked');
+    sfxClick();
+
+    // RPG: Massive XP, loot, achievement, boss defeated
+    useMana(30);
+    screenShake();
+    spellBurstEffect(window.innerWidth / 2, window.innerHeight / 3, '#ff44aa');
+    gainXP(200);
+    addGold(150);
+    setTimeout(() => dropLoot('legendary'), 800);
+    setTimeout(() => unlockAchievement('lover'), 1500);
+    updateQuestTracker(true, false);
+
+    // Boss HP depleted
+    const bossHp = document.getElementById('bossHp');
+    bossHp.style.width = '0%';
+
+    // Floating celebration texts
+    const celebTexts = ['KRITISCHER TREFFER!', 'BOSS BESIEGT!', 'QUEST COMPLETE!', 'EPISCHER SIEG!'];
+    celebTexts.forEach((t, i) => setTimeout(() => spawnFloatText(t, 'crit'), i * 400));
+
+    const ov = document.getElementById('celebrationOverlay');
+    ov.classList.add('active');
+
+    const hEmojis = ['❤️', '💕', '💖', '✨', '⚔️', '🔮', '💝', '🥰', '💫', '💗'];
+    for (let i = 0; i < 80; i++) {
+        setTimeout(() => {
+            const h = document.createElement('span');
+            h.className = 'celebration-heart';
+            h.textContent = hEmojis[Math.floor(Math.random() * hEmojis.length)];
+            h.style.left = Math.random() * 100 + 'vw';
+            h.style.top = Math.random() * 100 + 'vh';
+            h.style.fontSize = (1.5 + Math.random() * 3) + 'rem';
+            h.style.animationDelay = Math.random() * 0.5 + 's';
+            ov.appendChild(h);
+        }, i * 50);
+    }
+
+    const msgs = ['Ich liebe dich!', '✨', 'Für immer!', '⚔️💕', 'Quest erfüllt!', 'Ich liebe dich so sehr!', '🔮💖'];
+    for (let i = 0; i < 20; i++) {
+        setTimeout(() => {
+            const t = document.createElement('div');
+            t.className = 'love-text-rpg';
+            t.textContent = msgs[Math.floor(Math.random() * msgs.length)];
+            t.style.left = (5 + Math.random() * 85) + 'vw';
+            t.style.top = (5 + Math.random() * 85) + 'vh';
+            t.style.fontSize = (1.2 + Math.random() * 2) + 'rem';
+            ov.appendChild(t);
+        }, i * 200);
+    }
+
+    setTimeout(() => {
+        document.getElementById('successScreen').classList.add('active');
+        setInterval(() => {
+            const h = document.createElement('span');
+            h.className = 'celebration-heart';
+            h.textContent = hEmojis[Math.floor(Math.random() * hEmojis.length)];
+            h.style.left = Math.random() * 100 + 'vw';
+            h.style.top = Math.random() * 100 + 'vh';
+            h.style.fontSize = (1.5 + Math.random() * 2.5) + 'rem';
+            h.style.zIndex = '305';
+            document.body.appendChild(h);
+            setTimeout(() => h.remove(), 3000);
+        }, 300);
+    }, 3000);
+}
+
+// ════════════ NEIN (escapes) ════════════
+const btnNein = document.getElementById('btnNein');
+let neinEscaping = false, neinClicks = 0, escapeCount = 0;
+const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+
+function moveNeinButton() {
+    escapeCount++;
+    trackEvent('nein_escaped', { escapeCount });
+    if (escapeCount === 5) unlockAchievement('persistent');
+    sfxDamage();
+    spawnFloatText('VERFEHLT!', 'damage', btnNein.getBoundingClientRect().left, btnNein.getBoundingClientRect().top);
+    const bw = btnNein.offsetWidth, bh = btnNein.offsetHeight, pad = 20;
+    const mX = window.innerWidth - bw - pad, mY = window.innerHeight - bh - pad;
+
+    let rm = 1;
+    if (escapeCount > 12) { rm = 0.4; btnNein.classList.add('tired'); }
+    else if (escapeCount > 8) { rm = 0.6; }
+
+    let nx, ny;
+    if (rm < 1) {
+        const cl = parseFloat(btnNein.style.left) || mX / 2;
+        const ct = parseFloat(btnNein.style.top) || mY / 2;
+        const jr = 150 * rm;
+        nx = cl + (Math.random() - 0.5) * jr * 2;
+        ny = ct + (Math.random() - 0.5) * jr * 2;
+        nx = Math.max(pad, Math.min(mX, nx));
+        ny = Math.max(pad, Math.min(mY, ny));
+    } else {
+        nx = pad + Math.random() * mX;
+        ny = pad + Math.random() * mY;
+    }
+    btnNein.style.left = nx + 'px';
+    btnNein.style.top = ny + 'px';
+}
+
+function startEscaping() {
+    if (neinEscaping) return;
+    neinEscaping = true;
+    btnNein.classList.add('escaping');
+    const r = btnNein.getBoundingClientRect();
+    btnNein.style.left = r.left + 'px';
+    btnNein.style.top = r.top + 'px';
+    moveNeinButton();
+}
+
+function handleNeinHover() {
+    if (neinEscaping) return;
+    neinClicks++;
+    if (neinClicks >= (isTouch ? 1 : 2)) startEscaping();
+}
+
+btnNein.addEventListener('mouseenter', () => { if (neinEscaping) moveNeinButton(); });
+btnNein.addEventListener('mouseover', () => { handleNeinHover(); if (neinEscaping) moveNeinButton(); });
+
+btnNein.addEventListener('touchstart', e => {
+    if (!neinEscaping) { handleNeinHover(); if (neinEscaping) e.preventDefault(); return; }
+    e.preventDefault(); moveNeinButton();
+}, { passive: false });
+
+let ltx = null, lty = null;
+document.addEventListener('touchmove', e => {
+    if (!neinEscaping) return;
+    const t = e.touches[0]; ltx = t.clientX; lty = t.clientY;
+    const r = btnNein.getBoundingClientRect();
+    const d = Math.hypot(t.clientX - (r.left + r.width / 2), t.clientY - (r.top + r.height / 2));
+    if (d < (escapeCount > 10 ? 40 : 80)) moveNeinButton();
+}, { passive: true });
+
+document.addEventListener('touchend', () => {
+    if (!neinEscaping || !ltx) return;
+    const r = btnNein.getBoundingClientRect();
+    const d = Math.hypot(ltx - (r.left + r.width / 2), lty - (r.top + r.height / 2));
+    if (d < 60 && d > 5) moveNeinButton();
+});
+
+btnNein.addEventListener('click', () => {
+    if (!neinEscaping) { handleNeinHover(); return; }
+    trackEvent('nein_clicked');
+    sfxDamage();
+    damageFlash();
+    screenShake();
+    rpg.hp = Math.max(1, rpg.hp - 30);
+    spawnFloatText('-30 HP', 'damage');
+    spawnFloatText('GAME OVER', 'crit');
+    updateHUD();
+    showCryingOverlay();
+});
+
+function showCryingOverlay() {
+    const ov = document.getElementById('cryingOverlay');
+    ov.classList.add('active');
+    ov.innerHTML = '';
+
+    const ce = ['😭', '💔', '⚰️', '🥀', '☠️', '😢'];
+    for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+            const e = document.createElement('span');
+            e.className = 'crying-emoji';
+            e.textContent = ce[Math.floor(Math.random() * ce.length)];
+            e.style.left = Math.random() * 100 + 'vw';
+            e.style.top = '-50px';
+            e.style.fontSize = (1.5 + Math.random() * 2.5) + 'rem';
+            e.style.animationDelay = Math.random() * 0.5 + 's';
+            ov.appendChild(e);
+        }, i * 100);
+    }
+
+    setTimeout(() => {
+        const m = document.createElement('div');
+        m.className = 'crying-message';
+        m.innerHTML = '<h3>Quest fehlgeschlagen...</h3><p>Der Magier weint bittere Tränen.</p><button class="retry-btn" onclick="resetFromCrying()">⚔️ Erneut versuchen</button>';
+        ov.appendChild(m);
+    }, 1000);
+}
+
+function resetFromCrying() {
+    const ov = document.getElementById('cryingOverlay');
+    ov.classList.remove('active');
+    ov.innerHTML = '';
+    neinEscaping = false;
+    neinClicks = 0;
+    escapeCount = 0;
+    btnNein.classList.remove('escaping', 'tired');
+    btnNein.style.left = '';
+    btnNein.style.top = '';
+    btnNein.style.position = '';
+    trackEvent('nein_retry');
+    // RPG: Restore HP and Mana
+    rpg.hp = rpg.maxHp;
+    rpg.mana = rpg.maxMana;
+    healHP(0);
+    spawnFloatText('WIEDERBELEBT!', 'heal');
+    spellBurstEffect(window.innerWidth / 2, window.innerHeight / 2, '#44ff66');
+    updateHUD();
+}
+
+// ════════════ VIELLEICHT (Side Quests) ════════════
+const quizQs = [
+    { emoji: '🧝‍♀️', question: 'Eine Elfe erscheint: "Wenn Mandy dir jeden Morgen Frühstück ans Bett bringt... wählst du dann den Pfad der Liebe?"', jaText: '⚔️ Natürlich!', neinText: '🛡️ Ich kämpfe allein' },
+    { emoji: '🐉', question: 'Ein Drache brüllt: "Wenn Mandy immer den Film aussuchen lässt, den DU willst... verdient das nicht ein JA?"', jaText: '⚔️ Der Drache hat recht!', neinText: '🛡️ Weiter!' },
+    { emoji: '🧸', question: 'Ein verzauberter Bär spricht: "Wenn Mandy dir unendlich viele Kuscheltiere beschwört... sagst du dann Ja?"', jaText: '⚔️ KUSCHELTIERE!', neinText: '🛡️ Hab genug' },
+    { emoji: '🍫', question: 'Ein Schokoladen-Golem erscheint: "Wenn Mandy IMMER die letzte Schokolade für dich aufhebt... ist das nicht wahre Liebe?"', jaText: '⚔️ Schokolade = Liebe!', neinText: '🛡️ Nein danke' },
+    { emoji: '🎵', question: 'Eine Sirene singt: "Wenn Mandy dir jeden Tag ein Liebeslied singt (auch wenn sie nicht singen kann)... Ja?"', jaText: '⚔️ Wie süß!', neinText: '🛡️ Meine Ohren...' },
+    { emoji: '🌙', question: 'Der Mond flüstert: "Wenn Mandy dir jeden Abend 100 Herz-Emojis schickt... Ja oder Ja?"', jaText: '⚔️ JA JA JA!', neinText: '🛡️ ...50 reichen' },
+    { emoji: '☕', question: 'Ein Alchemist fragt: "Wenn Mandy dir immer den perfekten Trank braut... verdient das ein Ja?"', jaText: '⚔️ Absolut!', neinText: '🛡️ Ich brau selbst' },
+    { emoji: '🐺', question: 'Ein Werwolf heult: "Wenn Mandy mit dir jeden Hund streichelt... MUSS das Liebe sein!"', jaText: '⚔️ HUNDE! JA!', neinText: '🛡️ Katzen > Hunde' },
+    { emoji: '🎮', question: 'Ein Goblin grinst: "Wenn Mandy dich IMMER gewinnen lässt... dann klick Ja!"', jaText: '⚔️ Deal!', neinText: '🛡️ Ich gewinne eh' },
+    { emoji: '🌺', question: 'Letzte Prüfung! Eine Fee: "Mandy bietet dir unendlich Liebe, Kuscheln und Snacks. Wählst du den Pfad der Liebe?"', jaText: '⚔️ FÜR DIE LIEBE!', neinText: '🛡️ Mehr Snacks!' }
+];
+
+let qIdx = 0, sQuiz = [];
+
+function shuffleArr(a) {
+    const s = [...a];
+    for (let i = s.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [s[i], s[j]] = [s[j], s[i]];
+    }
+    return s;
+}
+
+async function handleVielleicht() {
+    trackEvent('vielleicht_clicked');
+    sfxClick();
+    useMana(20);
+    gainXP(25);
+    unlockAchievement('explorer');
+
+    // Battle transition before quiz
+    await battleTransition();
+
+    sQuiz = shuffleArr(quizQs);
+    qIdx = 0;
+    showQuiz();
+}
+
+function showQuiz() {
+    const ov = document.getElementById('quizOverlay');
+    ov.classList.add('active');
+
+    const q = sQuiz[qIdx];
+    document.getElementById('quizEmoji').textContent = q.emoji;
+    document.getElementById('quizQuestion').textContent = q.question;
+
+    // Dragon encounter achievement
+    if (q.emoji === '🐉') unlockAchievement('dragon_slayer');
+
+    const bJ = document.getElementById('quizBtnJa');
+    const bN = document.getElementById('quizBtnNein');
+    bJ.textContent = q.jaText;
+    bN.textContent = q.neinText;
+
+    bJ.onclick = () => {
+        trackEvent('quiz_ja', { question: q.question });
+        sfxClick();
+        ov.classList.remove('active');
+
+        // RPG rewards for passing quiz
+        gainXP(50);
+        healHP(15);
+        addGold(20);
+        unlockAchievement('scholar');
+        spellBurstEffect(window.innerWidth / 2, window.innerHeight / 2, '#44ff66');
+        setTimeout(() => dropLoot(), 600);
+        rpg.questsComplete++;
+        if (rpg.questsComplete >= 3) updateQuestTracker(false, true);
+
+        document.getElementById('questTitle').textContent = 'Zurück zur Hauptquest...';
+        const n = document.getElementById('questNotif');
+        n.classList.add('show');
+        setTimeout(() => n.classList.remove('show'), 3000);
+        typeMainDialog();
+    };
+
+    bN.onclick = () => {
+        trackEvent('quiz_nein', { question: q.question });
+        sfxDamage();
+        damageFlash();
+        screenShake();
+        rpg.hp = Math.max(1, rpg.hp - 10);
+        spawnFloatText('-10 HP', 'damage');
+        gainXP(15);
+        updateHUD();
+        qIdx++;
+        if (qIdx >= sQuiz.length) { qIdx = 0; sQuiz = shuffleArr(quizQs); }
+        const c = document.querySelector('.quiz-card');
+        c.style.animation = 'none';
+        c.offsetHeight;
+        c.style.animation = 'quizPop 0.4s cubic-bezier(0.175,0.885,0.32,1.275)';
+        showQuiz();
+    };
+}
+</script>
 </body>
 </html>
