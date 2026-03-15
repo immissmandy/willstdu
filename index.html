@@ -305,6 +305,49 @@
             to { opacity: 1; transform: translate(-50%,-50%) scale(1); }
         }
 
+        /* ─── Bloody Screen ─── */
+        .bloody-screen {
+            position: fixed; inset: 0; z-index: 101; pointer-events: none;
+            background: radial-gradient(ellipse at center, rgba(80,0,0,0.4) 0%, rgba(25,0,0,0.85) 100%);
+            animation: bloodyPulse 1.5s ease-in-out infinite;
+        }
+        .blood-drip {
+            position: fixed; top: -80px; border-radius: 0 0 50% 50%;
+            background: linear-gradient(to bottom, #6b0000, #cc0000, #ff2200);
+            animation: bloodDrip var(--dur, 3s) ease-in forwards;
+            z-index: 101; pointer-events: none;
+        }
+        .bloody-vignette {
+            position: fixed; inset: 0; z-index: 101; pointer-events: none;
+            box-shadow: inset 0 0 140px rgba(180,0,0,0.7), inset 0 0 60px rgba(100,0,0,0.5);
+            animation: bloodyPulse 2s ease-in-out infinite;
+        }
+        .sad-emoji-float {
+            position: fixed; pointer-events: none;
+            animation: sadFloat var(--dur, 4s) ease-in-out forwards;
+        }
+        .sad-emoji-burst {
+            position: fixed; pointer-events: none; transform: translate(-50%, -50%);
+            animation: sadBurst 2s ease-out forwards;
+        }
+        @keyframes bloodDrip {
+            0%   { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(120vh); opacity: 0.7; }
+        }
+        @keyframes bloodyPulse {
+            0%, 100% { opacity: 0.55; }
+            50%       { opacity: 1; }
+        }
+        @keyframes sadFloat {
+            0%   { opacity: 1; transform: translateY(0) translateX(0) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(-115vh) translateX(var(--dx, 40px)) rotate(400deg); }
+        }
+        @keyframes sadBurst {
+            0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+            40%  { opacity: 1; transform: translate(-50%, -50%) scale(2.8); }
+            100% { opacity: 0; transform: translate(-50%, -50%) scale(4.5); }
+        }
+
         /* ─── Quiz (Side Quest) ─── */
         .quiz-overlay {
             position: fixed; inset: 0; z-index: 200;
@@ -1754,24 +1797,95 @@ btnNein.addEventListener('click', () => {
     showCryingOverlay();
 });
 
+let cryingEmojiInterval = null;
+
+function spawnSadEmoji(container, emojis, type) {
+    const e = document.createElement('span');
+    e.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    e.style.fontSize = (1.5 + Math.random() * 4) + 'rem';
+    e.style.zIndex = '101';
+    if (type === 'float') {
+        e.className = 'sad-emoji-float';
+        e.style.left = Math.random() * 100 + 'vw';
+        e.style.bottom = '-50px';
+        const dur = (3 + Math.random() * 4) + 's';
+        const dx = (-70 + Math.random() * 140) + 'px';
+        e.style.setProperty('--dur', dur);
+        e.style.setProperty('--dx', dx);
+    } else {
+        e.className = 'crying-emoji';
+        e.style.left = Math.random() * 100 + 'vw';
+        e.style.top = '-50px';
+        const dur = (1.5 + Math.random() * 3) + 's';
+        e.style.animation = `cryFall ${dur} ease-in forwards`;
+    }
+    container.appendChild(e);
+    setTimeout(() => e.remove(), 8000);
+}
+
+function spawnBurstEmoji(container, emojis) {
+    const e = document.createElement('span');
+    e.className = 'sad-emoji-burst';
+    e.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    e.style.left = (5 + Math.random() * 90) + 'vw';
+    e.style.top  = (5 + Math.random() * 90) + 'vh';
+    e.style.fontSize = (2 + Math.random() * 3) + 'rem';
+    e.style.zIndex = '101';
+    container.appendChild(e);
+    setTimeout(() => e.remove(), 2500);
+}
+
 function showCryingOverlay() {
     const ov = document.getElementById('cryingOverlay');
     ov.classList.add('active');
     ov.innerHTML = '';
 
-    const ce = ['😭', '💔', '⚰️', '🥀', '☠️', '😢'];
-    for (let i = 0; i < 50; i++) {
-        setTimeout(() => {
-            const e = document.createElement('span');
-            e.className = 'crying-emoji';
-            e.textContent = ce[Math.floor(Math.random() * ce.length)];
-            e.style.left = Math.random() * 100 + 'vw';
-            e.style.top = '-50px';
-            e.style.fontSize = (1.5 + Math.random() * 2.5) + 'rem';
-            e.style.animationDelay = Math.random() * 0.5 + 's';
-            ov.appendChild(e);
-        }, i * 100);
+    // Bloody screen overlay + vignette
+    const bloodyScreen = document.createElement('div');
+    bloodyScreen.className = 'bloody-screen';
+    ov.appendChild(bloodyScreen);
+
+    const vignette = document.createElement('div');
+    vignette.className = 'bloody-vignette';
+    ov.appendChild(vignette);
+
+    // Blood drips from top (15-20 drips)
+    const dripCount = 15 + Math.floor(Math.random() * 6);
+    for (let i = 0; i < dripCount; i++) {
+        const drip = document.createElement('div');
+        drip.className = 'blood-drip';
+        drip.style.left   = Math.random() * 100 + 'vw';
+        drip.style.width  = (5 + Math.random() * 10) + 'px';
+        drip.style.height = (60 + Math.random() * 130) + 'px';
+        drip.style.setProperty('--dur', (2 + Math.random() * 4) + 's');
+        drip.style.animationDelay = (Math.random() * 2) + 's';
+        ov.appendChild(drip);
     }
+
+    const ce = ['😭', '💔', '😢', '😿', '🥺', '😞', '😔', '💀', '⚰️', '🥀', '☠️', '😩', '😖', '🫠', '🖤'];
+
+    // Initial burst: ~100 falling emojis
+    for (let i = 0; i < 100; i++) {
+        setTimeout(() => spawnSadEmoji(ov, ce, 'fall'), i * 60);
+    }
+
+    // Floating-up emojis from the bottom
+    for (let i = 0; i < 20; i++) {
+        setTimeout(() => spawnSadEmoji(ov, ce, 'float'), i * 150 + Math.random() * 400);
+    }
+
+    // Burst emojis appearing and expanding
+    for (let i = 0; i < 10; i++) {
+        setTimeout(() => spawnBurstEmoji(ov, ce), i * 200 + 200);
+    }
+
+    // Continuous spawner while overlay is active
+    cryingEmojiInterval = setInterval(() => {
+        const r = Math.random();
+        if (r < 0.6)      spawnSadEmoji(ov, ce, 'fall');
+        else if (r < 0.85) spawnSadEmoji(ov, ce, 'float');
+        else               spawnBurstEmoji(ov, ce);
+    }, 200);
 
     setTimeout(() => {
         const m = document.createElement('div');
@@ -1782,6 +1896,8 @@ function showCryingOverlay() {
 }
 
 function resetFromCrying() {
+    clearInterval(cryingEmojiInterval);
+    cryingEmojiInterval = null;
     const ov = document.getElementById('cryingOverlay');
     ov.classList.remove('active');
     ov.innerHTML = '';
