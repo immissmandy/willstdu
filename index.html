@@ -1427,7 +1427,6 @@ trackEvent('page_loaded');
 const actionLabels = {
     page_loaded: { icon: '🌐', label: 'Quest gestartet' },
     ja_clicked: { icon: '⚔️', label: 'JA gewählt!' },
-    nein_escaped: { icon: '🏃', label: 'Nein ist geflohen' },
     nein_clicked: { icon: '💔', label: 'Nein erwischt' },
     nein_retry: { icon: '🔄', label: 'Neue Chance' },
     vielleicht_clicked: { icon: '🔮', label: 'Vielleicht gewählt' },
@@ -1442,12 +1441,14 @@ function showResults() {
     let log = [];
     try { log = JSON.parse(localStorage.getItem('willstdu_log') || '[]'); } catch (e) {}
     if (!log.length) { l.innerHTML = '<li class="results-empty">Noch keine Einträge.</li>'; return; }
-    l.innerHTML = log.map(e => {
+    l.innerHTML = [...log].reverse().map(e => {
         const i = actionLabels[e.action] || { icon: '❓', label: e.action };
         const t = new Date(e.timestamp).toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         let x = '';
-        if (e.escapeCount) x = ` (#${e.escapeCount})`;
-        if (e.question) x = ` — ${e.question.substring(0, 35)}…`;
+        if (e.question) {
+            const q = e.question.length > 35 ? e.question.substring(0, 35) + '…' : e.question;
+            x = ` — ${q}`;
+        }
         return `<li><span class="result-icon">${i.icon}</span><span class="result-action">${i.label}${x}</span><span class="result-time">${t}</span></li>`;
     }).join('');
 }
