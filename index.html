@@ -213,17 +213,6 @@
         }
         .choice-btn:hover .choice-num { color: #f0c060; }
 
-        /* Nein button escaping */
-        .choice-nein.escaping {
-            position: fixed; transition: all 0.3s cubic-bezier(0.175,0.885,0.32,1.275);
-            max-width: 280px; touch-action: none; z-index: 20;
-        }
-        .choice-nein.tired {
-            transition: all 0.8s ease;
-            animation: neinWobble 0.5s ease-in-out infinite;
-        }
-        @keyframes neinWobble { 0%,100% { transform: rotate(0deg); } 25% { transform: rotate(-2deg); } 75% { transform: rotate(2deg); } }
-
         /* ─── Celebration ─── */
         .celebration-overlay { position: fixed; inset: 0; z-index: 100; pointer-events: none; display: none; }
         .celebration-overlay.active { display: block; }
@@ -1709,83 +1698,10 @@ function handleJa() {
     }, 3000);
 }
 
-// ════════════ NEIN (escapes) ════════════
+// ════════════ NEIN ════════════
 const btnNein = document.getElementById('btnNein');
-let neinEscaping = false, neinClicks = 0, escapeCount = 0;
-const isTouch = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-
-function moveNeinButton() {
-    escapeCount++;
-    trackEvent('nein_escaped', { escapeCount });
-    if (escapeCount === 5) unlockAchievement('persistent');
-    sfxDamage();
-    spawnFloatText('VERFEHLT!', 'damage', btnNein.getBoundingClientRect().left, btnNein.getBoundingClientRect().top);
-    const bw = btnNein.offsetWidth, bh = btnNein.offsetHeight, pad = 20;
-    const mX = window.innerWidth - bw - pad, mY = window.innerHeight - bh - pad;
-
-    let rm = 1;
-    if (escapeCount > 12) { rm = 0.4; btnNein.classList.add('tired'); }
-    else if (escapeCount > 8) { rm = 0.6; }
-
-    let nx, ny;
-    if (rm < 1) {
-        const cl = parseFloat(btnNein.style.left) || mX / 2;
-        const ct = parseFloat(btnNein.style.top) || mY / 2;
-        const jr = 150 * rm;
-        nx = cl + (Math.random() - 0.5) * jr * 2;
-        ny = ct + (Math.random() - 0.5) * jr * 2;
-        nx = Math.max(pad, Math.min(mX, nx));
-        ny = Math.max(pad, Math.min(mY, ny));
-    } else {
-        nx = pad + Math.random() * mX;
-        ny = pad + Math.random() * mY;
-    }
-    btnNein.style.left = nx + 'px';
-    btnNein.style.top = ny + 'px';
-}
-
-function startEscaping() {
-    if (neinEscaping) return;
-    neinEscaping = true;
-    btnNein.classList.add('escaping');
-    const r = btnNein.getBoundingClientRect();
-    btnNein.style.left = r.left + 'px';
-    btnNein.style.top = r.top + 'px';
-    moveNeinButton();
-}
-
-function handleNeinHover() {
-    if (neinEscaping) return;
-    neinClicks++;
-    if (neinClicks >= (isTouch ? 1 : 2)) startEscaping();
-}
-
-btnNein.addEventListener('mouseenter', () => { if (neinEscaping) moveNeinButton(); });
-btnNein.addEventListener('mouseover', () => { handleNeinHover(); if (neinEscaping) moveNeinButton(); });
-
-btnNein.addEventListener('touchstart', e => {
-    if (!neinEscaping) { handleNeinHover(); if (neinEscaping) e.preventDefault(); return; }
-    e.preventDefault(); moveNeinButton();
-}, { passive: false });
-
-let ltx = null, lty = null;
-document.addEventListener('touchmove', e => {
-    if (!neinEscaping) return;
-    const t = e.touches[0]; ltx = t.clientX; lty = t.clientY;
-    const r = btnNein.getBoundingClientRect();
-    const d = Math.hypot(t.clientX - (r.left + r.width / 2), t.clientY - (r.top + r.height / 2));
-    if (d < (escapeCount > 10 ? 40 : 80)) moveNeinButton();
-}, { passive: true });
-
-document.addEventListener('touchend', () => {
-    if (!neinEscaping || !ltx) return;
-    const r = btnNein.getBoundingClientRect();
-    const d = Math.hypot(ltx - (r.left + r.width / 2), lty - (r.top + r.height / 2));
-    if (d < 60 && d > 5) moveNeinButton();
-});
 
 btnNein.addEventListener('click', () => {
-    if (!neinEscaping) { handleNeinHover(); return; }
     trackEvent('nein_clicked');
     sfxDamage();
     damageFlash();
@@ -1901,13 +1817,6 @@ function resetFromCrying() {
     const ov = document.getElementById('cryingOverlay');
     ov.classList.remove('active');
     ov.innerHTML = '';
-    neinEscaping = false;
-    neinClicks = 0;
-    escapeCount = 0;
-    btnNein.classList.remove('escaping', 'tired');
-    btnNein.style.left = '';
-    btnNein.style.top = '';
-    btnNein.style.position = '';
     trackEvent('nein_retry');
     // RPG: Restore HP and Mana
     rpg.hp = rpg.maxHp;
